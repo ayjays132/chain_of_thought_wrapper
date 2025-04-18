@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <h1>NeuroReasoner Chain‑of‑Thought Toolkit</h1>
   <meta name="description" content="Chain‑of‑Thought wrapper and GUI for Hugging Face causal LMs with step‑by‑step reasoning and telemetry.">
 </head>
 <body>
