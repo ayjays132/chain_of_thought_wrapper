@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>NeuroReasoner Chain‑of‑Thought Toolkit</title>
+  NeuroReasoner Chain‑of‑Thought Toolkit
   <meta name="description" content="Open‑source Chain‑of‑Thought inference wrapper on Hugging Face, with step‑by‑step reasoning and telemetry.">
 </head>
 <body>
