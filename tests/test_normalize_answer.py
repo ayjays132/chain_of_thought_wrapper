@@ -1,5 +1,19 @@
 import os
 import sys
+# b3svha-codex/create-pytest-module-for-normalize_answer
+
+import pytest
+
+"""Unit tests for the `normalize_answer` helper.
+
+These checks cover lowercase conversion, punctuation stripping,
+article removal, number word conversion, and whitespace cleanup.
+"""
+
+# Make package importable when running tests from the repository root
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+=======
 import types
 
 import pytest
@@ -61,11 +75,42 @@ for name in (
     sys.modules.setdefault(name, types.ModuleType(name))
 
 from chain_of_thought_wrapper import normalize_answer  # noqa: E402
+#main
 
 
 @pytest.mark.parametrize(
     "raw,expected",
     [
+# b3svha-codex/create-pytest-module-for-normalize_answer
+        # Basic lowercase conversion and punctuation stripping
+        ("HeLLo", "hello"),
+        ("hello!!!", "hello"),
+
+        # Article and punctuation removal
+        ("The apple is red.", "apple is red"),
+
+        # Number word conversion
+        ("I have two apples.", "i have 2 apples"),
+
+        # Whitespace normalization
+        ("  hello   world  ", "hello world"),
+
+        # Common prefixes combined with number words
+        ("The answer is: FOUR.", "4"),
+        ("Result- three!", "3"),
+        ("Output: nine", "9"),
+
+        # Mixed casing with punctuation
+        ("A quick BROWN Fox.", "quick brown fox"),
+
+        # Extra spaces around prefix
+        ("Output -   ten.", "10"),
+
+        # Hyphenated words should remain intact
+        ("Ninety-nine bottles!", "ninety-nine bottles"),
+
+        # Non-string inputs should return an empty string
+=======
         ("HeLLo", "hello"),
         ("hello!!!", "hello"),
         ("The apple is red.", "apple is red"),
@@ -77,11 +122,19 @@ from chain_of_thought_wrapper import normalize_answer  # noqa: E402
         ("A quick BROWN Fox.", "quick brown fox"),
         ("Output -   ten.", "10"),
         ("Ninety-nine bottles!", "ninety-nine bottles"),
+#main
         (123, ""),
         (["not", "a", "string"], ""),
     ],
 )
+# b3svha-codex/create-pytest-module-for-normalize_answer
+def test_normalize_answer(raw, expected, dependency_stubs):
+    """Verify various normalization behaviours of normalize_answer."""
+    from chain_of_thought_wrapper import normalize_answer
+
+=======
 def test_normalize_answer(raw, expected):
     """Verify various normalization behaviours of normalize_answer."""
+#main
     assert normalize_answer(raw) == expected
 
