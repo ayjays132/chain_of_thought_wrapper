@@ -1,5 +1,7 @@
 import os
 import sys
+# Uses the dependency_stubs fixture from conftest to avoid installing heavy libraries
+
 # abf47s-codex/create-pytest-module-for-normalize_answer
 =======
 # b3svha-codex/create-pytest-module-for-normalize_answer
