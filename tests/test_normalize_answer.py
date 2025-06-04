@@ -1,7 +1,10 @@
 import os
 import sys
+# abf47s-codex/create-pytest-module-for-normalize_answer
+=======
 # b3svha-codex/create-pytest-module-for-normalize_answer
 
+# main
 import pytest
 
 """Unit tests for the `normalize_answer` helper.
@@ -11,6 +14,12 @@ article removal, number word conversion, and whitespace cleanup.
 """
 
 # Make package importable when running tests from the repository root
+# abf47s-codex/create-pytest-module-for-normalize_answer
+sys.path.insert(
+    0,
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..")),
+)
+=======
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 =======
@@ -76,12 +85,16 @@ for name in (
 
 from chain_of_thought_wrapper import normalize_answer  # noqa: E402
 #main
+# main
 
 
 @pytest.mark.parametrize(
     "raw,expected",
     [
+# abf47s-codex/create-pytest-module-for-normalize_answer
+=======
 # b3svha-codex/create-pytest-module-for-normalize_answer
+# main
         # Basic lowercase conversion and punctuation stripping
         ("HeLLo", "hello"),
         ("hello!!!", "hello"),
@@ -110,6 +123,8 @@ from chain_of_thought_wrapper import normalize_answer  # noqa: E402
         ("Ninety-nine bottles!", "ninety-nine bottles"),
 
         # Non-string inputs should return an empty string
+# abf47s-codex/create-pytest-module-for-normalize_answer
+=======
 =======
         ("HeLLo", "hello"),
         ("hello!!!", "hello"),
@@ -123,18 +138,26 @@ from chain_of_thought_wrapper import normalize_answer  # noqa: E402
         ("Output -   ten.", "10"),
         ("Ninety-nine bottles!", "ninety-nine bottles"),
 #main
+# main
         (123, ""),
         (["not", "a", "string"], ""),
     ],
 )
+# abf47s-codex/create-pytest-module-for-normalize_answer
+=======
 # b3svha-codex/create-pytest-module-for-normalize_answer
+# main
 def test_normalize_answer(raw, expected, dependency_stubs):
     """Verify various normalization behaviours of normalize_answer."""
     from chain_of_thought_wrapper import normalize_answer
 
+# abf47s-codex/create-pytest-module-for-normalize_answer
+    assert normalize_answer(raw) == expected
+=======
 =======
 def test_normalize_answer(raw, expected):
     """Verify various normalization behaviours of normalize_answer."""
 #main
     assert normalize_answer(raw) == expected
 
+# main
