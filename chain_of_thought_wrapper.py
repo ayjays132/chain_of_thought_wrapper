@@ -337,6 +337,108 @@ class ChainOfThoughtWrapper:
         logger.debug("ChainOfThoughtWrapper __init__ finished.")
 
 
+    def _build_agi_preamble(
+        self,
+        input_text: str,
+        image_data: Optional[List[bytes]] = None,
+    ) -> Tuple[str, str]:
+        """Gather context from AGI helper modules for the generation prompt."""
+        agi_pre_prompt_elements: List[str] = []
+        self_assessment_summary_text: Optional[str] = None
+
+        if AGI_IMPORTS_SUCCESS and self.neo_sentient_core:
+            perception_detail = (
+                f"User input: '{input_text[:200]}{'...' if len(input_text) > 200 else ''}'"
+            )
+            if image_data:
+                perception_detail += f" (with {len(image_data)} image(s))"
+            try:
+                self.neo_sentient_core.perceive(perception_detail)
+                logger.debug("NeoSentientCore perceived input.")
+            except Exception as e:
+                logger.warning(f"NeoSentientCore perceive failed: {e}")
+
+            try:
+                current_goal = self.neo_sentient_core.decide_goal()
+                if current_goal and isinstance(current_goal, str):
+                    agi_pre_prompt_elements.append(f"Intention: {current_goal.strip()}")
+            except Exception as e:
+                logger.warning(f"NeoSentientCore decide_goal failed: {e}")
+
+            try:
+                inner_monologue = self.neo_sentient_core.inner_voice()
+                if inner_monologue and isinstance(inner_monologue, str):
+                    agi_pre_prompt_elements.append(f"InnerVoice: {inner_monologue.strip()}")
+            except Exception as e:
+                logger.warning(f"NeoSentientCore inner_voice failed: {e}")
+
+            try:
+                qualia_token = self.neo_sentient_core.generate_qualia_token("curiosity")
+                if qualia_token and isinstance(qualia_token, str):
+                    agi_pre_prompt_elements.insert(0, qualia_token.strip())
+            except Exception as e:
+                logger.warning(f"NeoSentientCore generate_qualia_token failed: {e}")
+
+        if AGI_IMPORTS_SUCCESS and self.agi_enhancer:
+            enhancer_experience_detail = (
+                f"User input: '{input_text[:200]}{'...' if len(input_text) > 200 else ''}'"
+            )
+            if image_data:
+                enhancer_experience_detail += f" (with {len(image_data)} image(s))"
+            try:
+                self.agi_enhancer.log_experience(enhancer_experience_detail)
+                logger.debug("AGIEnhancer logged experience.")
+            except Exception as e:
+                logger.warning(f"AGIEnhancer log_experience failed: {e}")
+
+        if (
+            AGI_IMPORTS_SUCCESS
+            and self.self_assessment_module
+            and self.memory_engine
+            and self.neuro_processor
+            and self.neo_sentient_core
+        ):
+            try:
+                recent_reflections_snapshot = self.memory_engine.recall(
+                    include_long_term=True, include_working=True, limit=5
+                )
+                top_biases_snapshot = self.neuro_processor.recall_biases(top_k=10)
+                synaptic_weights_snapshot = self.neuro_processor.recall_weights(top_k=10)
+                neo_state_snapshot = self.neo_sentient_core.get_state()
+                current_emotions_snapshot = neo_state_snapshot.get("emotions", {})
+                intent_pool_snapshot = neo_state_snapshot.get("intent_pool", [])
+                qri_snapshot_data = None
+
+                assessment_result = self.self_assessment_module.perform_assessment(
+                    recent_reflections=recent_reflections_snapshot,
+                    top_biases=top_biases_snapshot,
+                    synaptic_weights_snapshot=synaptic_weights_snapshot,
+                    current_emotions=current_emotions_snapshot,
+                    intent_pool=intent_pool_snapshot,
+                    trace_summary=self.memory_engine.get_trace()[-10:]
+                    if self.memory_engine and len(self.memory_engine.get_trace()) > 0
+                    else [],
+                    qri_snapshot=qri_snapshot_data,
+                )
+                self_assessment_summary_text = assessment_result.get("state_summary", None)
+                logger.debug(
+                    "Performed simulated self-assessment and retrieved summary for prompt."
+                )
+            except Exception as e:
+                logger.error(f"Failed to perform simulated self-assessment: {e}")
+                self_assessment_summary_text = (
+                    "\n--- Simulated Self-Assessment Error ---\n"
+                    "Internal assessment module encountered an issue and cannot provide a state summary.\n---\n"
+                )
+
+        agi_pre_prompt = "\n".join(agi_pre_prompt_elements) + "\n\n" if agi_pre_prompt_elements else ""
+        self_assessment_prompt_part = (
+            self_assessment_summary_text + "\n\n" if self_assessment_summary_text else ""
+        )
+
+        return agi_pre_prompt, self_assessment_prompt_part
+
+
     @torch.no_grad() # Ensure no gradients are calculated during inference
     def generate(
         self,
@@ -396,101 +498,10 @@ class ChainOfThoughtWrapper:
              logger.info(f"Received {len(image_data)} image(s). Wrapper multimodal capable: {self.multimodal_capable}")
 
 
-        # --- AGI Helper Module Interaction (Pre-Generation) ---
-        # Use NeoSentientCore and AGIEnhancer to add internal state to the prompt
-        # Adapt to include mention of image data if present
-        agi_pre_prompt_elements: List[str] = []
-        if AGI_IMPORTS_SUCCESS and self.neo_sentient_core:
-            # Simulate perception of the input (text and image presence)
-            perception_detail = f"User input: '{input_text[:200]}{'...' if len(input_text) > 200 else ''}'"
-            if image_data:
-                 perception_detail += f" (with {len(image_data)} image(s))"
-            try:
-                self.neo_sentient_core.perceive(perception_detail)
-                logger.debug("NeoSentientCore perceived input.")
-            except Exception as e:
-                 logger.warning(f"NeoSentientCore perceive failed: {e}")
-
-
-            # Get elements from the AGI core to inject into the prompt
-            # Decide goal (conceptual)
-            try:
-                current_goal = self.neo_sentient_core.decide_goal()
-                if current_goal and isinstance(current_goal, str): agi_pre_prompt_elements.append(f"Intention: {current_goal.strip()}")
-            except Exception as e:
-                 logger.warning(f"NeoSentientCore decide_goal failed: {e}")
-
-            # Get inner voice (conceptual)
-            try:
-                inner_monologue = self.neo_sentient_core.inner_voice()
-                if inner_monologue and isinstance(inner_monologue, str): agi_pre_prompt_elements.append(f"InnerVoice: {inner_monologue.strip()}")
-            except Exception as e:
-                 logger.warning(f"NeoSentientCore inner_voice failed: {e}")
-
-            # Get qualia token (conceptual emotion priming)
-            # Using curiosity as a default for exploration, could be more dynamic later
-            try:
-                qualia_token = self.neo_sentient_core.generate_qualia_token("curiosity") # Example
-                if qualia_token and isinstance(qualia_token, str): agi_pre_prompt_elements.insert(0, qualia_token.strip()) # Add qualia at the start
-            except Exception as e:
-                 logger.warning(f"NeoSentientCore generate_qualia_token failed: {e}")
-
-
-        if AGI_IMPORTS_SUCCESS and self.agi_enhancer:
-            # Log the experience with the AGIEnhancer
-            # Pass text and mention image presence
-            enhancer_experience_detail = f"User input: '{input_text[:200]}{'...' if len(input_text) > 200 else ''}'"
-            if image_data:
-                 enhancer_experience_detail += f" (with {len(image_data)} image(s))"
-            try:
-                self.agi_enhancer.log_experience(enhancer_experience_detail)
-                logger.debug("AGIEnhancer logged experience.")
-            except Exception as e:
-                 logger.warning(f"AGIEnhancer log_experience failed: {e}")
-
-
-        self_assessment_summary_text: Optional[str] = None # Use a descriptive name for the summary text
-        if AGI_IMPORTS_SUCCESS and self.self_assessment_module and \
-           self.memory_engine and self.neuro_processor and self.neo_sentient_core:
-             try:
-                 # Gather necessary data snapshots from other modules for the assessment
-                 # These calls assume your other modules have methods like these
-                 recent_reflections_snapshot = self.memory_engine.recall(include_long_term=True, include_working=True, limit=5) # Get some recent memories/reflections
-                 top_biases_snapshot = self.neuro_processor.recall_biases(top_k=10) # Get top biases
-                 synaptic_weights_snapshot = self.neuro_processor.recall_weights(top_k=10) # Get top weights
-                 neo_state_snapshot = self.neo_sentient_core.get_state() # Get core state (emotions, intents, narrative)
-                 current_emotions_snapshot = neo_state_snapshot.get("emotions", {}) # Extract emotions dict
-                 intent_pool_snapshot = neo_state_snapshot.get("intent_pool", []) # Extract intents list
-                 # Assuming AGIEnhancer or NeoSentientCore stores/calculates QRI if used
-                 # You'll need to retrieve QRI data from where you store it if you want it in the assessment
-                 qri_snapshot_data = None # Placeholder - set to actual QRI data if available
-
-                 # Call the assessment module's main method
-                 assessment_result = self.self_assessment_module.perform_assessment(
-                     recent_reflections=recent_reflections_snapshot,
-                     top_biases=top_biases_snapshot,
-                     synaptic_weights_snapshot=synaptic_weights_snapshot,
-                     current_emotions=current_emotions_snapshot,
-                     intent_pool=intent_pool_snapshot,
-                     # Assuming MemoryEngine trace is accessible, or NeoSentientCore narrative memory
-                     trace_summary=self.memory_engine.get_trace()[-10:] if self.memory_engine and len(self.memory_engine.get_trace()) > 0 else [], # Get recent trace summary
-                     qri_snapshot=qri_snapshot_data # Pass QRI data here if retrieved
-                 )
-                 # Extract the summary text generated by the assessment module
-                 self_assessment_summary_text = assessment_result.get("state_summary", None)
-                 logger.debug("Performed simulated self-assessment and retrieved summary for prompt.")
-             except Exception as e:
-                 logger.error(f"Failed to perform simulated self-assessment: {e}")
-                 # Provide a default error summary if assessment fails, so the prompt still has something
-                 self_assessment_summary_text = "\n--- Simulated Self-Assessment Error ---\nInternal assessment module encountered an issue and cannot provide a state summary.\n---\n"
-
-
-        # Construct the full prompt including AGI elements, Self-Assessment summary, and CoT template components
-        # This text will be combined with images by the processor for multimodal models
-        agi_pre_prompt = "\n".join(agi_pre_prompt_elements) + "\n\n" if agi_pre_prompt_elements else ""
-
-        # ADDED: Include the self-assessment summary in the prompt if it was successfully generated
-        self_assessment_prompt_part = self_assessment_summary_text + "\n\n" if self_assessment_summary_text else ""
+        # --- Collect AGI Context (Pre-Generation) ---
+        agi_pre_prompt, self_assessment_prompt_part = self._build_agi_preamble(
+            input_text, image_data
+        )
 
 
         # Construct the core CoT prompt string for the text part of the input

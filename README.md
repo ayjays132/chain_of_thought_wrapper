@@ -15,6 +15,11 @@
     <strong>real‑time telemetry</strong>,
     all packaged as a Python wrapper and a futuristic Streamlit GUI.
   </p>
+  <p>
+    The interface ships with a sleek dark theme, smooth hover transitions, and a
+    one‑click "Copy" button on every code block for effortless sharing of generated
+    scripts.
+  </p>
 
   <h2>📂 Included Scripts</h2>
   <ul>
@@ -73,6 +78,14 @@ print("Final Answer:", result["final_answers"][0])
     <li><strong>Self‑Consistency</strong>: Toggle majority‑vote across chains.</li>
     <li><strong>Max New Tokens</strong>: Length of generated reasoning.</li>
     <li><strong>Temperature</strong>, <strong>Top‑k</strong>, <strong>Top‑p</strong> &amp; <strong>No‑repeat n‑gram</strong>: Sampling controls.</li>
+  </ul>
+
+  <h2>✨ Polished User Experience</h2>
+  <ul>
+    <li><strong>Dark theme</strong> with neon accents and subtle gradients.</li>
+    <li><strong>Copy button</strong> on each code block for instant script copying.</li>
+    <li><strong>Responsive layout</strong> that adapts to desktop and mobile screens.</li>
+    <li><strong>Telemetry panel</strong> displaying GPU stats in real time.</li>
   </ul>
 
   <h2>⏳ Example GUI Session</h2>
