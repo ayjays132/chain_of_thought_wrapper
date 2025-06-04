@@ -1,5 +1,20 @@
 import os
 import sys
+
+import pytest
+
+"""Unit tests for the :func:`normalize_answer` helper.
+
+These checks cover lowercase conversion, punctuation stripping,
+article removal, number word conversion, and whitespace cleanup.
+The tests depend on the ``dependency_stubs`` fixture from ``conftest.py``
+to inject lightweight module stubs so the wrapper imports cleanly without
+heavy optional packages installed.
+"""
+
+
+# Make package importable when running tests from the repository root
+=======
 # abf47s-codex/create-pytest-module-for-normalize_answer
 =======
 # b3svha-codex/create-pytest-module-for-normalize_answer
@@ -19,6 +34,8 @@ sys.path.insert(
     0,
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..")),
 )
+
+=======
 =======
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -84,13 +101,12 @@ for name in (
     sys.modules.setdefault(name, types.ModuleType(name))
 
 from chain_of_thought_wrapper import normalize_answer  # noqa: E402
-#main
-# main
 
 
 @pytest.mark.parametrize(
     "raw,expected",
     [
+=======
 # abf47s-codex/create-pytest-module-for-normalize_answer
 =======
 # b3svha-codex/create-pytest-module-for-normalize_answer
@@ -123,6 +139,8 @@ from chain_of_thought_wrapper import normalize_answer  # noqa: E402
         ("Ninety-nine bottles!", "ninety-nine bottles"),
 
         # Non-string inputs should return an empty string
+
+=======
 # abf47s-codex/create-pytest-module-for-normalize_answer
 =======
 =======
@@ -139,18 +157,24 @@ from chain_of_thought_wrapper import normalize_answer  # noqa: E402
         ("Ninety-nine bottles!", "ninety-nine bottles"),
 #main
 # main
+
         (123, ""),
         (["not", "a", "string"], ""),
     ],
 )
+
+=======
 # abf47s-codex/create-pytest-module-for-normalize_answer
 =======
 # b3svha-codex/create-pytest-module-for-normalize_answer
 # main
+
 def test_normalize_answer(raw, expected, dependency_stubs):
     """Verify various normalization behaviours of normalize_answer."""
     from chain_of_thought_wrapper import normalize_answer
 
+    assert normalize_answer(raw) == expected
+=======
 # abf47s-codex/create-pytest-module-for-normalize_answer
     assert normalize_answer(raw) == expected
 =======
