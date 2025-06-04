@@ -1370,13 +1370,59 @@ st.markdown("""
           border-color: #BD93F9 !important;
      }
      /* Remove default Streamlit spacing for columns inside chat message */
-     [data-testid="chatContainer"] [data-testid="stChatMessage"] [data-testid="stHorizontalBlock"] {
+    [data-testid="chatContainer"] [data-testid="stChatMessage"] [data-testid="stHorizontalBlock"] {
           gap: 1rem !important;
      }
+
+    /* Copy button for code blocks */
+    .copy-button {
+        position: absolute !important;
+        top: 0.4rem !important;
+        right: 0.4rem !important;
+        background: #3F3F55 !important;
+        color: #FFFFFF !important;
+        border: none !important;
+        border-radius: 0.3rem !important;
+        padding: 0.2rem 0.6rem !important;
+        font-size: 0.8rem !important;
+        cursor: pointer !important;
+        opacity: 0.8 !important;
+    }
+    .copy-button:hover {
+        opacity: 1 !important;
+    }
 
 
 </style>
 """, unsafe_allow_html=True)
+
+# --- Code Copy Script ---
+st.markdown(
+    """
+    <script>
+    function addCopyButtons(){
+        document.querySelectorAll('pre').forEach(function(pre){
+            const parent = pre.parentElement;
+            if(parent.classList.contains('code-with-copy')) return;
+            parent.classList.add('code-with-copy');
+            const btn = document.createElement('button');
+            btn.textContent = 'Copy';
+            btn.className = 'copy-button';
+            btn.addEventListener('click', function(){
+                navigator.clipboard.writeText(pre.innerText);
+                btn.textContent = 'Copied!';
+                setTimeout(function(){btn.textContent='Copy';}, 2000);
+            });
+            parent.style.position = 'relative';
+            parent.appendChild(btn);
+        });
+    }
+    document.addEventListener('DOMContentLoaded', addCopyButtons);
+    new MutationObserver(addCopyButtons).observe(document.body,{subtree:true,childList:true});
+    </script>
+    """,
+    unsafe_allow_html=True,
+)
 
 
 # --- GPU Telemetry Setup ---
