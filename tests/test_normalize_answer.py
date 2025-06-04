@@ -3,6 +3,12 @@ import sys
 
 import pytest
 
+"""Unit tests for the `normalize_answer` helper.
+
+These checks cover lowercase conversion, punctuation stripping,
+article removal, number word conversion, and whitespace cleanup.
+"""
+
 # Make package importable when running tests from the repository root
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
