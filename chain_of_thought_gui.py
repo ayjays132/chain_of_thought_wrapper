@@ -1562,7 +1562,9 @@ def _load_model_and_processor_cached(model_name: str, device: str):
             # And if the model config indicates bfloat16 is preferred or supported
             # This is a heuristic; explicit model docs are best.
             try:
-                gpu_major_version = torch.cuda.get_device_properties(device).major
+                cuda_dev = torch.device(device)
+                gpu_index = cuda_dev.index if cuda_dev.index is not None else torch.cuda.current_device()
+                gpu_major_version = torch.cuda.get_device_properties(gpu_index).major
                 if gpu_major_version >= 8: # Ampere or newer
                     # Check model config for preferred dtype if available
                     if model_config is not None and hasattr(model_config, 'torch_dtype') and model_config.torch_dtype == torch.bfloat16:
@@ -1575,7 +1577,9 @@ def _load_model_and_processor_cached(model_name: str, device: str):
                     else:
                          logger.info("GPU supports bfloat16 but model config/architecture doesn't explicitly suggest it. Loading with float32.")
             except Exception as dtype_e:
-                 logger.warning(f"Could not determine GPU bfloat16 support or model preference ({dtype_e}). Loading with float32.")
+                 logger.error(f"Failed to inspect CUDA device '{device}': {dtype_e}. Falling back to CPU.")
+                 status_box.error(f"Invalid CUDA device '{device}'. Falling back to CPU.")
+                 device = "cpu"
                  torch_dtype = torch.float32
         else:
              logger.info("Not on CUDA device. Loading with float32.")
