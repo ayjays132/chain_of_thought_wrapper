@@ -63,7 +63,7 @@ logger.setLevel(logging.INFO) # Set default level to INFO
 # The wrapper now needs to accept the processor (tokenizer + image processor).
 try:
     # Ensure the wrapper is imported correctly
-    from chain_of_thought_wrapper import ChainOfThoughtWrapper
+    from chain_of_thought_wrapper import ChainOfThoughtWrapper, validate_device_selection
     logger.info("Successfully imported ChainOfThoughtWrapper.")
 except ImportError:
     logger.error("🚨 Fatal Error: `chain_of_thought_wrapper.py` not found. Please ensure the enhanced wrapper script is in the same directory.")
@@ -1432,7 +1432,9 @@ try:
         logger.info("No NVML-compatible GPU devices found.")
     else:
          # Check if the selected device is a CUDA device and if telemetry works for it
-         selected_device = st.session_state.get("device_select", "cpu")
+         selected_device = validate_device_selection(
+             st.session_state.get("device_select", "cpu")
+         )
          if selected_device.startswith("cuda"):
               try:
                    # Attempt to get handle for the selected cuda device index
@@ -1464,7 +1466,9 @@ telemetry_placeholder = st.sidebar.empty() # Place in sidebar
 def update_telemetry():
     """Updates the telemetry display in the dedicated placeholder."""
     telemetry_text = "📊 System Status: [Initializing...]"
-    selected_device = st.session_state.get("device_select", "cpu")
+    selected_device = validate_device_selection(
+        st.session_state.get("device_select", "cpu")
+    )
 
     if not GPU_AVAILABLE or not selected_device.startswith("cuda"):
         telemetry_text = "📊 System Status: [No Compatible GPU Available or Selected for Telemetry]"
@@ -1952,6 +1956,11 @@ with st.sidebar:
         key="device_select", # Persistent key
         help="Select the device (CPU or GPU) to load the model onto. Larger or multimodal models often require GPU."
     )
+    # Validate device choice against current CUDA availability
+    validated_device = validate_device_selection(device_select)
+    if validated_device != device_select:
+        st.session_state.device_select = validated_device
+        device_select = validated_device
 
     # Load Model Button
     if st.button("Load Model"):

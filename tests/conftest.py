@@ -21,6 +21,10 @@ def dependency_stubs():
         def empty_cache() -> None:
             pass
 
+        @staticmethod
+        def device_count() -> int:
+            return 0
+
     torch_stub.cuda = DummyCuda()
     stubs["torch"] = torch_stub
 
