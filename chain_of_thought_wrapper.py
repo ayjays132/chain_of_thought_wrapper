@@ -251,6 +251,19 @@ class ChainOfThoughtWrapper:
         self.step_prefix = step_prefix
         self.final_answer_tag = final_answer_tag
         self.max_length = max_length
+        # If the loaded model defines a maximum positional embedding length,
+        # ensure the wrapper does not allow inputs longer than that limit.
+        if hasattr(self.model, "config"):
+            model_max_len = getattr(self.model.config, "max_position_embeddings", None)
+            if model_max_len is None:
+                model_max_len = getattr(self.model.config, "n_positions", None)
+            if model_max_len is not None and self.max_length > model_max_len:
+                logger.warning(
+                    "Specified max_length %s exceeds model's max_position_embeddings (%s). Reducing to model limit.",
+                    self.max_length,
+                    model_max_len,
+                )
+                self.max_length = model_max_len
         self._artifact_patterns = ARTIFACT_PATTERNS # Use default artifact patterns
         self.reasoning_steps_limit = DEFAULT_REASONING_LIMIT # Use default limit for parsing
 
