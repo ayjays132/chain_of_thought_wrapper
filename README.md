@@ -1,46 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="description" content="Chain‑of‑Thought wrapper and GUI for Hugging Face causal LMs with step‑by‑step reasoning and telemetry.">
-</head>
-<body>
+# 🚀 NeuroReasoner Chain-of-Thought Toolkit
 
-  <h1>🚀 NeuroReasoner Chain‑of‑Thought Toolkit</h1>
+A breakthrough open-source suite providing: **always-on** Chain-of-Thought reasoning, **self-consistency** sampling, and **real-time telemetry**, all packaged as a Python wrapper and a futuristic Streamlit GUI.
 
-  <p>
-    A breakthrough open‑source suite providing:
-    <strong>always‑on</strong> Chain‑of‑Thought reasoning,
-    <strong>self‑consistency</strong> sampling, and
-    <strong>real‑time telemetry</strong>,
-    all packaged as a Python wrapper and a futuristic Streamlit GUI.
-  </p>
-  <p>
-    The interface ships with a sleek dark theme, smooth hover transitions, and a
-    one‑click "Copy" button on every code block for effortless sharing of generated
-    scripts.
-  </p>
+The interface ships with a sleek dark theme, smooth hover transitions, and a one-click "Copy" button on every code block for effortless sharing of generated scripts.
 
-  <h2>📂 Included Scripts</h2>
-  <ul>
-    <li><code>chain_of_thought_wrapper.py</code> – the core Python module you import into your own scripts.</li>
-    <li><code>chain_of_thought_gui.py</code> – a Streamlit app for interactive, no‑code usage.</li>
-  </ul>
+## 📂 Included Scripts
 
-  <h2>⚙️ Installation</h2>
-  <ol>
-    <li>Clone or unzip this folder.</li>
-    <li>Install required packages:
-      <pre><code>pip install -r requirements.txt</code></pre>
-    </li>
-    <li>Ensure your model checkpoint (e.g. <code>ayjays132/NeuroReasoner‑1‑NR‑1</code>) is accessible
-      or change the name in the GUI script.
-    </li>
-  </ol>
+- `chain_of_thought_wrapper.py` – the core Python module you import into your own scripts.
+- `chain_of_thought_gui.py` – a Streamlit app for interactive, no-code usage.
 
-  <h2>👩‍💻 Importing &amp; Using the Wrapper</h2>
-  <p>Embed step‑by‑step reasoning directly in your Python code:</p>
-  <pre><code>from chain_of_thought_wrapper import ChainOfThoughtWrapper
+## ⚙️ Installation
+
+1. Clone or unzip this folder.
+2. Install required packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Ensure your model checkpoint (e.g. `ayjays132/NeuroReasoner-1-NR-1`) is accessible or change the name in the GUI script.
+
+## 👩‍💻 Importing & Using the Wrapper
+
+Embed step-by-step reasoning directly in your Python code:
+
+```python
+from chain_of_thought_wrapper import ChainOfThoughtWrapper
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 
@@ -56,52 +39,57 @@ cot = ChainOfThoughtWrapper(model=model, tokenizer=tokenizer, device=device)
 # 3) Prepare your prompt
 inputs = tokenizer("Why is the sky blue?", return_tensors="pt").to(device)
 
-# 4) Generate step‑by‑step reasoning
+# 4) Generate step-by-step reasoning
 result = cot.generate(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask)
 
 # 5) Inspect the output
 for i, step in enumerate(result["reasoning_steps"][0], 1):
     print(f"Step {i}:", step)
 print("Final Answer:", result["final_answers"][0])
-</code></pre>
+```
 
-  <h2>🖥️ Launching the GUI</h2>
-  <p>No code edits needed—just run:</p>
-  <pre><code>streamlit run chain_of_thought_gui.py</code></pre>
-  <p>Then open the local URL in your browser. Adjust model name, device, number of chains, sampling parameters, and enter your prompt.</p>
+## 🖥️ Launching the GUI
 
-  <h2>🔧 GUI Configuration Options</h2>
-  <ul>
-    <li><strong>Model</strong>: Hugging Face repo or local path.</li>
-    <li><strong>Device</strong>: cuda or cpu.</li>
-    <li><strong># Chains</strong>: Number of reasoning samples.</li>
-    <li><strong>Self‑Consistency</strong>: Toggle majority‑vote across chains.</li>
-    <li><strong>Max New Tokens</strong>: Length of generated reasoning.</li>
-    <li><strong>Temperature</strong>, <strong>Top‑k</strong>, <strong>Top‑p</strong> &amp; <strong>No‑repeat n‑gram</strong>: Sampling controls.</li>
-  </ul>
+No code edits needed—just run:
 
-  <h2>✨ Polished User Experience</h2>
-  <ul>
-    <li><strong>Dark theme</strong> with neon accents and subtle gradients.</li>
-    <li><strong>Copy button</strong> on each code block for instant script copying.</li>
-    <li><strong>Responsive layout</strong> that adapts to desktop and mobile screens.</li>
-    <li><strong>Telemetry panel</strong> displaying GPU stats in real time.</li>
-  </ul>
+```bash
+streamlit run chain_of_thought_gui.py
+```
 
-  <h2>⏳ Example GUI Session</h2>
-  <pre><code>▶ Prompt: What causes rainbows?
-▶ Chains: 3, Self‑Consistency: on
-▶ Sampling: temp 0.7, top‑k 50, top‑p 0.9
+Then open the local URL in your browser. Adjust model name, device, number of chains, sampling parameters, and enter your prompt.
+
+## 🔧 GUI Configuration Options
+
+- **Model**: Hugging Face repo or local path.
+- **Device**: cuda or cpu.
+- **# Chains**: Number of reasoning samples.
+- **Self-Consistency**: Toggle majority-vote across chains.
+- **Max New Tokens**: Length of generated reasoning.
+- **Temperature**, **Top-k**, **Top-p** & **No-repeat n-gram**: Sampling controls.
+
+## ✨ Polished User Experience
+
+- **Dark theme** with neon accents and subtle gradients.
+- **Copy button** on each code block for instant script copying.
+- **Responsive layout** that adapts to desktop and mobile screens.
+- **Telemetry panel** displaying GPU stats in real time.
+
+## ⏳ Example GUI Session
+
+```text
+▶ Prompt: What causes rainbows?
+▶ Chains: 3, Self-Consistency: on
+▶ Sampling: temp 0.7, top-k 50, top-p 0.9
 …generating…
 ▼ Chain 1 ▼
 1. Sunlight is composed of multiple colors.
 2. Water droplets refract and disperse each color.
 3. Observer sees spectrum as arc.
 Final Answer: Rainbows form when sunlight refracts and disperses through droplets, separating into colors.
-…</code></pre>
+…
+```
 
-  <h2>📜 License</h2>
-  <p>Released under the <strong>MIT License</strong>. Free to use, modify, and share—empower everyone with transparent, step‑by‑step AI reasoning!</p>
+## 📜 License
 
-</body>
-</html>
+Released under the **MIT License**. Free to use, modify, and share—empower everyone with transparent, step-by-step AI reasoning!
+
