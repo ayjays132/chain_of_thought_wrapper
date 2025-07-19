@@ -2149,6 +2149,41 @@ with st.sidebar:
         logger.info("Chat history cleared and welcome message added.")
         st.rerun() # Rerun to clear the display
 
+    def _chat_history_to_text(history):
+        """Convert chat history to a plain text transcript."""
+        lines = []
+        for msg in history:
+            role = msg.get("role", "assistant")
+            content = msg.get("content", "")
+            msg_type = msg.get("type", "text")
+            if isinstance(content, dict):
+                if role == "user":
+                    user_text = content.get("text", "")
+                    lines.append(f"User: {user_text}")
+                    if content.get("image_data"):
+                        lines.append(f"[Attached {len(content.get('image_data'))} image(s)]")
+                elif msg_type == "cot_response":
+                    lines.append(f"Assistant: {content.get('main_output_display', '')}")
+                else:
+                    lines.append(f"{role}: {str(content)}")
+            else:
+                lines.append(f"{role}: {str(content)}")
+        return "\n".join(lines)
+
+    if st.session_state.chat_history:
+        history_text = _chat_history_to_text(st.session_state.chat_history)
+        st.download_button(
+            label="📥 Download Chat History",
+            data=history_text,
+            file_name="chat_history.txt",
+            mime="text/plain",
+        )
+
+    if st.button("Reset Session"):
+        logger.info("Reset Session button clicked.")
+        st.session_state.clear()
+        st.rerun()
+
 
     # Telemetry Footer (Automatically updated)
     # The telemetry_placeholder was defined before the sidebar

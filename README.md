@@ -73,6 +73,8 @@ Then open the local URL in your browser. Adjust model name, device, number of ch
 - **Copy button** on each code block for instant script copying.
 - **Responsive layout** that adapts to desktop and mobile screens.
 - **Telemetry panel** displaying GPU stats in real time.
+- **Download Chat History** option for saving transcripts.
+- **Reset Session** button to quickly clear the interface.
 
 ## ⏳ Example GUI Session
 
