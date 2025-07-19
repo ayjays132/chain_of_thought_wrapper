@@ -239,8 +239,13 @@ class ChainOfThoughtWrapper:
         """
         logger.debug("ChainOfThoughtWrapper __init__ started.")
         self.model = model
-        self.processor = processor # Store the processor (can be AutoProcessor or AutoTokenizer)
-        self.device = device
+        self.processor = processor  # Store the processor (can be AutoProcessor or AutoTokenizer)
+
+        # Validate the requested device string when provided
+        if isinstance(device, str):
+            self.device = validate_device_selection(device)
+        else:
+            self.device = device
         self.cot_instruction = cot_instruction
         self.reasoning_header = reasoning_header
         self.step_prefix = step_prefix
