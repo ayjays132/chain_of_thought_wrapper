@@ -1545,9 +1545,9 @@ def _load_model_and_processor_cached(model_name: str, device: str):
             logger.info(f"Processor loaded successfully. Processor type: {type(processor)}")
             status_box.write("Processor loaded. Loading model weights...")
         except Exception as proc_e:
-             logger.error(f"Failed to load processor: {proc_e}")
-             status_box.error(f"Failed to load processor for '{model_name}'. Details: {proc_e}")
-             # Clean up resources
+            logger.error(f"Failed to load processor: {proc_e}")
+            status_box.error(f"Failed to load processor for '{model_name}'. Details: {proc_e}")
+            # Clean up resources
             if model_config is not None: del model_config
             if torch.cuda.is_available():
                 try:
