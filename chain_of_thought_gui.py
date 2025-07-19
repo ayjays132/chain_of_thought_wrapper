@@ -1563,8 +1563,13 @@ def _load_model_and_processor_cached(model_name: str, device: str):
             # This is a heuristic; explicit model docs are best.
             try:
                 cuda_dev = torch.device(device)
-                gpu_index = cuda_dev.index if cuda_dev.index is not None else torch.cuda.current_device()
-                gpu_major_version = torch.cuda.get_device_properties(gpu_index).major
+                if cuda_dev.index is None:
+                    cuda_dev = torch.device("cuda", torch.cuda.current_device())
+
+                if cuda_dev.index >= torch.cuda.device_count():
+                    raise IndexError(f"CUDA device index {cuda_dev.index} out of range")
+
+                gpu_major_version = torch.cuda.get_device_properties(cuda_dev).major
                 if gpu_major_version >= 8: # Ampere or newer
                     # Check model config for preferred dtype if available
                     if model_config is not None and hasattr(model_config, 'torch_dtype') and model_config.torch_dtype == torch.bfloat16:
