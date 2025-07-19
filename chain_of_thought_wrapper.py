@@ -170,18 +170,27 @@ def validate_device_selection(selected_device: str) -> str:
         if not torch.cuda.is_available():
             logger.warning("CUDA not available. Falling back to CPU.")
             return "cpu"
-        try:
-            index = int(selected_device.split(":")[-1]) if ":" in selected_device else 0
-        except ValueError:
-            logger.warning(
-                f"Invalid CUDA device specification '{selected_device}'. Falling back to CPU."
-            )
-            return "cpu"
-        if index >= torch.cuda.device_count():
+
+        # Default to device index 0 when none is specified
+        index = 0
+        if ":" in selected_device:
+            try:
+                index = int(selected_device.split(":")[-1])
+            except ValueError:
+                logger.warning(
+                    f"Invalid CUDA device specification '{selected_device}'. Falling back to CPU."
+                )
+                return "cpu"
+
+        if index < 0 or index >= torch.cuda.device_count():
             logger.warning(
                 f"Selected CUDA device index {index} is out of range (Max index: {torch.cuda.device_count() - 1}). Falling back to CPU."
             )
             return "cpu"
+
+        # Return the canonical device string
+        return f"cuda:{index}"
+
     return selected_device
 
 # NOTE: This voting function is for the EXAMPLE USAGE BLOCK only and is NOT
