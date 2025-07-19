@@ -37,3 +37,23 @@ def test_valid_device_kept(dependency_stubs):
     sys.modules.pop("chain_of_thought_wrapper", None)
     from chain_of_thought_wrapper import validate_device_selection
     assert validate_device_selection("cuda:1") == "cuda:1"
+
+
+def test_canonical_index_returned(dependency_stubs):
+    torch = dependency_stubs["torch"]
+    torch.cuda.is_available = lambda: True
+    torch.cuda.device_count = lambda: 1
+    import sys
+    sys.modules.pop("chain_of_thought_wrapper", None)
+    from chain_of_thought_wrapper import validate_device_selection
+    assert validate_device_selection("cuda") == "cuda:0"
+
+
+def test_negative_index_falls_back(dependency_stubs):
+    torch = dependency_stubs["torch"]
+    torch.cuda.is_available = lambda: True
+    torch.cuda.device_count = lambda: 1
+    import sys
+    sys.modules.pop("chain_of_thought_wrapper", None)
+    from chain_of_thought_wrapper import validate_device_selection
+    assert validate_device_selection("cuda:-1") == "cpu"
