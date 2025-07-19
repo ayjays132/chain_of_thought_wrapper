@@ -1,3 +1,5 @@
+
+from __future__ import annotations
 # chain_of_thought_wrapper.py
 
 import re
@@ -5,28 +7,25 @@ import torch
 import logging
 from transformers import (
     PreTrainedModel,
-    AutoTokenizer,
-    GenerationConfig,
     GenerationMixin,
+    GenerationConfig,
     # Keep AutoModelForCausalLM for example usage block, but not used in main wrapper logic
     # We rely on AutoModel now
     # AutoModelForCausalLM, # Removed as AutoModel is more general
     # ADDED: AutoProcessor and AutoModel for multimodal handling
     AutoProcessor,
     AutoModel,
-    AutoConfig, # Needed for checking model config
     # Import specific model classes if AutoModel isn't sufficient for a specific type
     # from transformers import LlamaForCausalLM # Example
     # from transformers import LlavaForConditionalGeneration # Example multimodal model class
 )
-from transformers.utils import is_accelerate_available, is_bitsandbytes_available
-from typing import Optional, List, Tuple, Dict, Union, Any # Added Any
-import gc # Import garbage collector for cleanup
-import time # Import time for potential timing/logging (unused in final code, but good practice)
-from collections import Counter # Needed for voting
+from typing import TYPE_CHECKING, Optional, List, Tuple, Dict, Union, Any
+import gc  # Import garbage collector for cleanup
 from PIL import Image # Needed for handling image data
 import io # Needed for handling image bytes
-import os # Needed for path handling
+
+if TYPE_CHECKING:
+    from transformers import AutoTokenizer
 
 
 # ─── NEW: memory imports ─────────────────────────────────────────
@@ -484,13 +483,6 @@ class ChainOfThoughtWrapper:
         params = generation_params if generation_params is not None else {}
         effective_num_return_sequences = params.get("num_return_sequences", 1)
         # Use default values if not provided in params
-        max_new_tokens = params.get("max_new_tokens", 512)
-        temperature = params.get("temperature", 0.7)
-        top_k = params.get("top_k", 50)
-        top_p = params.get("top_p", 1.0)
-        do_sample = params.get("do_sample", True)
-        repetition_penalty = params.get("repetition_penalty", 1.1)
-        no_repeat_ngram_size = params.get("no_repeat_ngram_size", 0)
 
 
         logger.info(f"Generating {effective_num_return_sequences} sequence(s) with params: {params}")
@@ -1119,7 +1111,7 @@ class ChainOfThoughtWrapper:
              logger.debug("Attempting fallback for final answer...")
              # Iterate backwards from the end
              # Start from the last line, or just before the answer tag line if tag was found but empty
-             start_index_for_fallback = answer_line_index if tagged and answer_line_index != -1 else len(lines) -1
+             start_index_for_fallback = answer_line_index if tagged and answer_line_index != -1 else len(lines) - 1
              for i in range(start_index_for_fallback, -1, -1):
                   line = lines[i]
                   # Check if the line is *not* a step line AND is not empty

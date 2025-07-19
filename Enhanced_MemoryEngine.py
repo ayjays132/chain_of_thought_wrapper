@@ -5,7 +5,7 @@ import json
 import logging
 import random # Added random for flavor text selection
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional, Union, Tuple # Added Tuple typing
+from typing import Any, Callable, Dict, List, Optional, Union
 from collections import Counter # Added Counter for emotional analysis
 
 # Attempt to import torch, handle gracefully if not available

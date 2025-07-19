@@ -5,7 +5,7 @@ import random
 import time
 import logging
 from datetime import datetime # Import datetime for formatted timestamp in example
-from typing import Any, Dict, List, Optional, Union # Added typing imports
+from typing import Any, Dict, List  # Typing imports
 
 # --- Logging Setup ---
 # Configure logging specifically for the NeoSentientCore module.
