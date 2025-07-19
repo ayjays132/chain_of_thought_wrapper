@@ -1,18 +1,6 @@
-=======
-# abf47s-codex/create-pytest-module-for-normalize_answer
-=======
-import os
-# main
-
 import sys
 import types
 import pytest
-
-=======
-# abf47s-codex/create-pytest-module-for-normalize_answer
-
-=======
-# main
 @pytest.fixture
 def dependency_stubs():
     """Insert lightweight stubs for heavy optional dependencies."""
