@@ -20,6 +20,7 @@ ensures full output display, and incorporates extensive futuristic styling.
 """
 import time
 import re  # Needed for answer normalization
+import json
 import streamlit as st
 import torch
 import pynvml  # For GPU telemetry
@@ -1890,6 +1891,26 @@ def perform_self_consistency_voting(final_answers: List[str]) -> Tuple[Optional[
     return consensus_normalized_answer, dict(answer_distribution), consensus_raw_answers
 
 
+def prepare_download_data(
+    final_answer: str,
+    generated_results: List[Dict],
+    consensus_answer: Optional[str],
+    vote_counts: Optional[Dict[str, int]],
+    generation_params: Dict,
+    model_info: str,
+) -> Dict:
+    """Bundle key generation results for download as JSON."""
+
+    return {
+        "final_answer": final_answer,
+        "generated_results": generated_results,
+        "consensus_answer": consensus_answer,
+        "vote_counts": vote_counts,
+        "generation_params": generation_params,
+        "model_info": model_info,
+    }
+
+
 # --- Streamlit App Layout and Logic ---
 
 # Initialize chat history in session state if it doesn't exist
@@ -2148,6 +2169,13 @@ with st.sidebar:
         })
         logger.info("Chat history cleared and welcome message added.")
         st.rerun() # Rerun to clear the display
+
+    st.download_button(
+        label="Download Chat History",
+        data=json.dumps(st.session_state.chat_history, indent=2),
+        file_name="chat_history.json",
+        mime="application/json",
+    )
 
 
     # Telemetry Footer (Automatically updated)
@@ -2418,6 +2446,22 @@ for message in st.session_state.chat_history:
 
                     # Add a little space after the main expander if it was shown
                     st.markdown("<br>", unsafe_allow_html=True)
+
+                    # Offer a download of the latest generation data
+                    download_payload = prepare_download_data(
+                        final_answer=str(main_output_display),
+                        generated_results=generated_results,
+                        consensus_answer=consensus_answer,
+                        vote_counts=vote_counts,
+                        generation_params=generation_params,
+                        model_info=str(model_info),
+                    )
+                    st.download_button(
+                        label="Download Results",
+                        data=json.dumps(download_payload, indent=2),
+                        file_name="cot_results.json",
+                        mime="application/json",
+                    )
 
                 # --- END Refactored Assistant CoT Response Rendering (Fixed Expander Nesting & Full Output as Main) ---
 
