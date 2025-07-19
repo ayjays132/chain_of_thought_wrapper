@@ -57,3 +57,12 @@ def test_negative_index_falls_back(dependency_stubs):
     sys.modules.pop("chain_of_thought_wrapper", None)
     from chain_of_thought_wrapper import validate_device_selection
     assert validate_device_selection("cuda:-1") == "cpu"
+
+def test_wrapper_validates_device(dependency_stubs):
+    torch = dependency_stubs["torch"]
+    torch.cuda.is_available = lambda: False
+    import sys
+    sys.modules.pop("chain_of_thought_wrapper", None)
+    from chain_of_thought_wrapper import ChainOfThoughtWrapper
+    wrapper = ChainOfThoughtWrapper(model=None, processor=None, device="cuda:2")
+    assert wrapper.device == "cpu"
