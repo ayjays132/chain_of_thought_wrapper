@@ -18,34 +18,29 @@ for generation capability after loading, includes a minor fix for telemetry,
 resolves the Streamlit expander nesting issue by restructuring output display,
 ensures full output display, and incorporates extensive futuristic styling.
 """
-import os
 import time
-import re # Needed for answer normalization
+import re  # Needed for answer normalization
 import streamlit as st
 import torch
-import pynvml # For GPU telemetry
-import numpy as np
-import logging # Import logging
+import pynvml  # For GPU telemetry
+import logging  # Import logging
 
 from transformers import (
     AutoConfig,
-    AutoTokenizer,
     # We will explicitly try CausalLM and Seq2SeqLM first
     AutoModelForCausalLM,
     AutoModelForSeq2SeqLM,
     # Keep AutoModel for fallback
     AutoModel,
-    AutoProcessor, # Needed for multimodal models that combine tokenizer and image processor
-    GenerationConfig,
-    PretrainedConfig,
+    AutoProcessor,  # Needed for multimodal models that combine tokenizer and image processor
     # Import Vision-to-Sequence models if AutoModel isn't sufficient for a specific type
     # from transformers import AutoModelForVision2Seq # Can be used for specific types if AutoModel fails
     # Import GenerationMixin to check for generate capability
     GenerationMixin,
 )
-from collections import Counter # For self-consistency voting
-import gc # Import garbage collector
-from typing import Any, Dict, List, Optional, Tuple, Union
+from collections import Counter  # For self-consistency voting
+import gc  # Import garbage collector
+from typing import Dict, List, Optional, Tuple
 # No need for markdown library, st.markdown is used.
 from PIL import Image # Needed for handling uploaded images
 import io # Needed for handling image bytes

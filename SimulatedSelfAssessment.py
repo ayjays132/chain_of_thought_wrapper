@@ -3,11 +3,9 @@
 
 import logging
 import time
-import random
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union, Tuple
-from collections import Counter
-import math
+from typing import Any, Dict, List, Optional, Union
+
 
 # --- Logging Setup ---
 logger = logging.getLogger(__name__)
@@ -121,7 +119,6 @@ class SimulatedSelfAssessment:
 
             # Analyze Bias Landscape (Robust checks used on biases_data)
             bias_count = len(biases_data)
-            bias_strength_sum = sum(abs(b) for b in biases_data.values() if isinstance(b, (int, float))) # Sum only valid numeric values
             bias_state_cue = "A complex interplay of conceptual biases is currently active" if bias_count > 10 else ("Several prominent biases influence cognitive processing" if bias_count > 3 else "Few strong conceptual biases are currently dominant")
             bias_tone_cue = "Bias landscape is conceptually quiet" # Default if no biases
             if bias_count > 0:
@@ -142,7 +139,6 @@ class SimulatedSelfAssessment:
 
 
             # Analyze Emotional Landscape (Robust checks used on emotions_data)
-            emotion_count = len(emotions_data)
             # Filter for active emotions (numeric values > 0.3)
             active_emotions = {k: v for k, v in emotions_data.items() if isinstance(v, (int, float)) and v > 0.3}
             active_emotion_count = len(active_emotions)
@@ -289,7 +285,6 @@ class SimulatedSelfAssessment:
         except Exception as e:
             # --- Handle Internal Assessment Errors Gracefully ---
             # Catch any unexpected errors during the synthesis process.
-            error_time = time.time()
             error_message = f"An unexpected error occurred during simulated self-assessment synthesis at {datetime.utcnow().isoformat()}. Details: {e}"
             logger.error(error_message, exc_info=True) # Log the full traceback internally
 
