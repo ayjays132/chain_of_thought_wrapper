@@ -1548,10 +1548,14 @@ def _load_model_and_processor_cached(model_name: str, device: str):
              logger.error(f"Failed to load processor: {proc_e}")
              status_box.error(f"Failed to load processor for '{model_name}'. Details: {proc_e}")
              # Clean up resources
-             if model_config is not None: del model_config
-             if torch.cuda.is_available(): torch.cuda.empty_cache()
-             gc.collect()
-             return None, None, False # Return failure
+            if model_config is not None: del model_config
+            if torch.cuda.is_available():
+                try:
+                    torch.cuda.empty_cache()
+                except Exception as cleanup_e:
+                    logger.warning(f"Error during cuda empty_cache: {cleanup_e}")
+            gc.collect()
+            return None, None, False # Return failure
 
 
         # Determine appropriate dtype based on device and model config
@@ -1633,7 +1637,11 @@ def _load_model_and_processor_cached(model_name: str, device: str):
             if model is not None: del model
             if processor is not None: del processor
             if model_config is not None: del model_config
-            if torch.cuda.is_available(): torch.cuda.empty_cache()
+            if torch.cuda.is_available():
+                try:
+                    torch.cuda.empty_cache()
+                except Exception as cleanup_e:
+                    logger.warning(f"Error during cuda empty_cache: {cleanup_e}")
             gc.collect()
             return None, processor, False # Return None for model and False for multimodal on failure
 
@@ -1700,7 +1708,11 @@ def _load_model_and_processor_cached(model_name: str, device: str):
         if model is not None: del model
         if processor is not None: del processor
         if model_config is not None: del model_config
-        if torch.cuda.is_available(): torch.cuda.empty_cache()
+        if torch.cuda.is_available():
+            try:
+                torch.cuda.empty_cache()
+            except Exception as cleanup_e:
+                logger.warning(f"Error during cuda empty_cache: {cleanup_e}")
         gc.collect()
         # No re-raise here, return None and the calling function handles the error state
 

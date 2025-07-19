@@ -772,7 +772,11 @@ class ChainOfThoughtWrapper:
         except Exception as e:
             logger.error("Failed to prepare input tensors (tokenization/image processing): %s", e)
             # Attempt cleanup before raising
-            if torch.cuda.is_available(): torch.cuda.empty_cache()
+            if torch.cuda.is_available():
+                try:
+                    torch.cuda.empty_cache()
+                except Exception as cleanup_e:
+                    logger.warning(f"Error during cuda empty_cache: {cleanup_e}")
             gc.collect()
             # Do not re-raise here, return empty lists and let the GUI handle the error
             return {"full_texts": [], "reasoning_steps": [], "final_answers": [], "generated_images": [], "generation_scores": None}
@@ -892,7 +896,11 @@ class ChainOfThoughtWrapper:
         except Exception as e:
             logger.error("Failed during model generation: %s", e)
             # Attempt cleanup before raising
-            if torch.cuda.is_available(): torch.cuda.empty_cache()
+            if torch.cuda.is_available():
+                try:
+                    torch.cuda.empty_cache()
+                except Exception as cleanup_e:
+                    logger.warning(f"Error during cuda empty_cache: {cleanup_e}")
             gc.collect()
             # Do not re-raise here, return empty lists and let the GUI handle the error
             return {"full_texts": [], "reasoning_steps": [], "final_answers": [], "generated_images": [], "generation_scores": None}
