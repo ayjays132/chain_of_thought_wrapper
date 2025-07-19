@@ -31,7 +31,7 @@
   <ol>
     <li>Clone or unzip this folder.</li>
     <li>Install required packages:
-      <pre><code>pip install torch transformers streamlit pynvml</code></pre>
+      <pre><code>pip install -r requirements.txt</code></pre>
     </li>
     <li>Ensure your model checkpoint (e.g. <code>ayjays132/NeuroReasoner‑1‑NR‑1</code>) is accessible
       or change the name in the GUI script.
