@@ -116,6 +116,43 @@ st.set_page_config(
     }
 )
 
+# --- Theme Selection ---
+with st.sidebar:
+    theme_choice = st.selectbox(
+        "🎨 Theme",
+        ["Dark", "Light"],
+        index=0,
+        key="theme_select",
+    )
+
+LIGHT_THEME_CSS = """
+<style>
+html, body, [data-testid="stAppViewContainer"] {
+    color: #111 !important;
+}
+.stApp {
+    background: linear-gradient(160deg, #FFFFFF 0%, #F0F0F0 50%, #FFFFFF 100%) !important;
+    color: #111 !important;
+}
+.stSidebar {
+    background: linear-gradient(180deg, #FFFFFF 0%, #F5F5F5 50%, #EAEAEA 100%) !important;
+    color: #111 !important;
+    border-right: 1px solid #CCCCCC !important;
+}
+h1, h2, h3, h4, h5, h6 {
+    color: #0A84FF !important;
+}
+.stButton>button {
+    background: linear-gradient(180deg, #0A84FF 0%, #0066CC 100%) !important;
+    color: #FFFFFF !important;
+    border: 1px solid #0A84FF !important;
+}
+.stButton>button:hover {
+    background: linear-gradient(180deg, #4DA3FF 0%, #0A84FF 100%) !important;
+}
+</style>
+"""
+
 # --- Extensive Futuristic and Layered CSS Styling ---
 st.markdown("""
 <style>
@@ -1390,6 +1427,9 @@ st.markdown("""
 
 </style>
 """, unsafe_allow_html=True)
+
+if theme_choice == "Light":
+    st.markdown(LIGHT_THEME_CSS, unsafe_allow_html=True)
 
 # --- Code Copy Script ---
 st.markdown(
