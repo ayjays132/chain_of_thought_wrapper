@@ -1639,8 +1639,17 @@ def _load_model_and_processor_cached(model_name: str, device: str):
 
 
         # If loading was successful, move model to device and set to eval mode
-        model.to(device)
-        model.eval() # Crucial for consistent inference behavior
+        try:
+            model.to(device)
+        except Exception as move_e:
+            logger.error(f"Failed to move model to {device}: {move_e}")
+            status_box.error(f"Failed to move model to {device}: {move_e}")
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            gc.collect()
+            return None, None, False
+
+        model.eval()  # Crucial for consistent inference behavior
         logger.info(f"Model moved to {device} and set to eval mode. Model type: {type(model)}")
 
 
@@ -1960,6 +1969,9 @@ with st.sidebar:
     validated_device = validate_device_selection(device_select)
     if validated_device != device_select:
         st.session_state.device_select = validated_device
+        st.warning(
+            f"Selected device '{device_select}' is not available. Using '{validated_device}' instead."
+        )
         device_select = validated_device
 
     # Load Model Button
