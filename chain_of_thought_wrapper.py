@@ -163,6 +163,27 @@ def normalize_answer(answer: str) -> str:
 
     return normalized
 
+
+def validate_device_selection(selected_device: str) -> str:
+    """Validate CUDA device selection and fall back to CPU when invalid."""
+    if isinstance(selected_device, str) and selected_device.startswith("cuda"):
+        if not torch.cuda.is_available():
+            logger.warning("CUDA not available. Falling back to CPU.")
+            return "cpu"
+        try:
+            index = int(selected_device.split(":")[-1]) if ":" in selected_device else 0
+        except ValueError:
+            logger.warning(
+                f"Invalid CUDA device specification '{selected_device}'. Falling back to CPU."
+            )
+            return "cpu"
+        if index >= torch.cuda.device_count():
+            logger.warning(
+                f"Selected CUDA device index {index} is out of range (Max index: {torch.cuda.device_count() - 1}). Falling back to CPU."
+            )
+            return "cpu"
+    return selected_device
+
 # NOTE: This voting function is for the EXAMPLE USAGE BLOCK only and is NOT
 # directly used by the ChainOfThoughtWrapper.generate method.
 # It's included here for completeness if the user wanted to test the wrapper
