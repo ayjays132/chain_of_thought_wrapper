@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 
 
 # Make package importable when running tests from the repository root
@@ -8,6 +9,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 
 def test_fallback_when_cuda_unavailable(dependency_stubs, caplog):
+    caplog.set_level(logging.CRITICAL)
     torch = dependency_stubs["torch"]
     torch.cuda.is_available = lambda: False
     import sys
@@ -18,6 +20,7 @@ def test_fallback_when_cuda_unavailable(dependency_stubs, caplog):
 
 
 def test_fallback_on_invalid_index(dependency_stubs, caplog):
+    caplog.set_level(logging.CRITICAL)
     torch = dependency_stubs["torch"]
     torch.cuda.is_available = lambda: True
     torch.cuda.device_count = lambda: 1
