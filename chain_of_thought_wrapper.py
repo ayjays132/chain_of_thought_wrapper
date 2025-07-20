@@ -834,12 +834,23 @@ class ChainOfThoughtWrapper:
             # Prioritize max_new_tokens from input params if provided, otherwise use max_length
             if 'max_new_tokens' in params:
                  cfg.max_new_tokens = params['max_new_tokens']
-                 # Ensure max_length is also set to reflect the potential total length constraint
-                 # Only set cfg.max_length if it's not already explicitly set in params or if it's smaller
-                 # This prevents overwriting a larger desired max_length from a user-provided config object
-                 if cfg.max_length is None or (input_length + cfg.max_new_tokens) < cfg.max_length:
-                     cfg.max_length = input_length + cfg.max_new_tokens if input_length + cfg.max_new_tokens > 0 else None
-                 logger.debug("Using max_new_tokens from params: %s. Calculated total max_length: %s", cfg.max_new_tokens, cfg.max_length)
+                 effective_total_length = input_length + cfg.max_new_tokens if input_length + cfg.max_new_tokens > 0 else 0
+                 if effective_total_length > self.max_length:
+                     logger.warning(
+                         "Effective total length (%d) exceeds wrapper max_length (%d). Adjusting max_new_tokens.",
+                         effective_total_length,
+                         self.max_length,
+                     )
+                     cfg.max_new_tokens = max(0, self.max_length - input_length)
+                     effective_total_length = input_length + cfg.max_new_tokens
+                     logger.warning("Adjusted max_new_tokens to %d.", cfg.max_new_tokens)
+                 if cfg.max_length is None or effective_total_length > cfg.max_length:
+                     cfg.max_length = effective_total_length if effective_total_length > 0 else None
+                 logger.debug(
+                     "Using max_new_tokens from params: %s. Calculated total max_length: %s",
+                     cfg.max_new_tokens,
+                     cfg.max_length,
+                 )
 
             elif cfg.max_new_tokens is None:
                  # If max_new_tokens is NOT set in params or default cfg, ensure the total length
