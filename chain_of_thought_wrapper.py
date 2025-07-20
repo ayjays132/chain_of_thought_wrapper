@@ -2,6 +2,7 @@
 from __future__ import annotations
 # chain_of_thought_wrapper.py
 
+import os
 import re
 import torch
 import logging
@@ -66,19 +67,28 @@ except ImportError as e:
 
 
 # --- Logging Setup for Wrapper ---
-# Configure logging for the module. This helps in debugging and understanding wrapper behavior.
-# Ensure this runs only if basicConfig hasn't been called by imported modules
-if not logging.root.handlers:
-     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# Configure logging only when no handlers exist on the root logger or when the
+# COT_DEBUG environment variable is set. This prevents noisy output during tests
+DEBUG_MODE = bool(os.getenv("COT_DEBUG"))
+if DEBUG_MODE or not logging.root.handlers:
+    level = logging.DEBUG if DEBUG_MODE else logging.INFO
+    logging.basicConfig(level=level,
+                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 logger = logging.getLogger(__name__)
-if not logger.handlers: # Check again in case imported modules added handlers
+if not logger.handlers and (DEBUG_MODE or not logging.root.handlers):
     handler = logging.StreamHandler()
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.propagate = False
-logger.setLevel(logging.DEBUG) # Set default level to DEBUG for detailed wrapper logs
+
+if DEBUG_MODE:
+    logger.setLevel(logging.DEBUG)
+elif logger.handlers:
+    logger.setLevel(logger.handlers[0].level)
+else:
+    logger.addHandler(logging.NullHandler())
 
 
 # --- Default Configuration Values ---
