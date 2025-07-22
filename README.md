@@ -75,6 +75,9 @@ Then open the local URL in your browser. Adjust model name, device, number of ch
 - **Telemetry panel** displaying GPU stats in real time.
 - **Download Chat History** option for saving transcripts.
 - **Reset Session** button to quickly clear the interface.
+- **Premium theme** option for a high-contrast look.
+- **Auto-scroll** feature to always show the latest message.
+- **Download Last Reasoning** button for saving the most recent answer.
 
 ## ⏳ Example GUI Session
 
