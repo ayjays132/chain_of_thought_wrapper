@@ -120,7 +120,7 @@ st.set_page_config(
 with st.sidebar:
     theme_choice = st.selectbox(
         "🎨 Theme",
-        ["Dark", "Light", "Premium"],
+        ["Dark", "Light", "Premium", "Alien"],
         index=0,
         key="theme_select",
     )
@@ -177,6 +177,33 @@ h1, h2, h3, h4, h5, h6 {
 }
 .stButton>button:hover {
     background: linear-gradient(180deg, #B39BFF 0%, #9E84FF 100%) !important;
+}
+</style>
+"""
+
+ALIEN_THEME_CSS = """
+<style>
+html, body, [data-testid="stAppViewContainer"] {
+    color: #d0fffc !important;
+}
+.stApp {
+    background: radial-gradient(circle at 30% 30%, #002b36 0%, #001014 100%) !important;
+    color: #d0fffc !important;
+}
+.stSidebar {
+    background: linear-gradient(180deg, #00181e 0%, #002b36 100%) !important;
+    border-right: 1px solid #005f6b !important;
+}
+h1, h2, h3, h4, h5, h6 {
+    color: #2be4d4 !important;
+}
+.stButton>button {
+    background: linear-gradient(180deg, #2be4d4 0%, #008b94 100%) !important;
+    color: #001014 !important;
+    border: 1px solid #008b94 !important;
+}
+.stButton>button:hover {
+    background: linear-gradient(180deg, #5ffbf1 0%, #2be4d4 100%) !important;
 }
 </style>
 """
@@ -1460,6 +1487,8 @@ if theme_choice == "Light":
     st.markdown(LIGHT_THEME_CSS, unsafe_allow_html=True)
 elif theme_choice == "Premium":
     st.markdown(PREMIUM_THEME_CSS, unsafe_allow_html=True)
+elif theme_choice == "Alien":
+    st.markdown(ALIEN_THEME_CSS, unsafe_allow_html=True)
 
 # --- Code Copy Script ---
 st.markdown(

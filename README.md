@@ -79,9 +79,11 @@ Then open the local URL in your browser. Adjust model name, device, number of ch
 - **Download Chat History** option for saving transcripts.
 - **Reset Session** button to quickly clear the interface.
 - **Premium theme** option for a high-contrast look.
+- **Alien theme** for a vibrant sci‑fi aesthetic.
 - **Auto-scroll** feature to always show the latest message.
 - **Download Last Reasoning** button for saving the most recent answer.
 - **Generation duration** displayed for each response.
+- **GPU/CPU memory metrics** returned with each generation call.
 - **Roman numeral normalization** ensures outputs like "IV" convert to "4".
 - **Hyphenated number words** like "twenty-one" convert to digits for cleaner voting.
 

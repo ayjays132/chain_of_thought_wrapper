@@ -25,6 +25,7 @@ import gc  # Import garbage collector for cleanup
 from PIL import Image  # Needed for handling image data
 import io  # Needed for handling image bytes
 import time  # Measure generation duration
+import psutil  # For CPU memory metrics
 
 if TYPE_CHECKING:
     from transformers import AutoTokenizer
@@ -237,6 +238,21 @@ def validate_device_selection(selected_device: str) -> str:
         return f"cuda:{index}"
 
     return selected_device
+
+def get_device_metrics(device: Union[str, torch.device]) -> Dict[str, float]:
+    """Return simple memory metrics for the given device."""
+    if isinstance(device, str) and device.startswith("cuda") and torch.cuda.is_available():
+        index = 0
+        if ":" in device:
+            try:
+                index = int(device.split(":")[-1])
+            except ValueError:
+                index = 0
+        allocated = float(torch.cuda.memory_allocated(index)) / (1024 ** 2)
+        reserved = float(torch.cuda.memory_reserved(index)) / (1024 ** 2)
+        return {"gpu_memory_allocated_mb": allocated, "gpu_memory_reserved_mb": reserved}
+    mem = psutil.virtual_memory()
+    return {"cpu_memory_used_mb": float(mem.used) / (1024 ** 2), "cpu_memory_total_mb": float(mem.total) / (1024 ** 2)}
 
 # NOTE: This voting function is for the EXAMPLE USAGE BLOCK only and is NOT
 # directly used by the ChainOfThoughtWrapper.generate method.
@@ -575,6 +591,7 @@ class ChainOfThoughtWrapper:
         """
         logger.debug("Wrapper generate method called.")
         start_time = time.time()
+        device_metrics_before = get_device_metrics(self.device)
         # Added check for model generation compatibility at the start of generate
         if self.model is None or self.processor is None or self.tokenizer is None or \
            not (hasattr(self.model, 'generate') and callable(getattr(self.model, 'generate', None)) or isinstance(self.model, GenerationMixin)):
@@ -587,6 +604,8 @@ class ChainOfThoughtWrapper:
                 "generated_images": [],
                 "generation_scores": None,
                 "generation_duration": time.time() - start_time,
+                "device_metrics_before": device_metrics_before,
+                "device_metrics_after": get_device_metrics(self.device),
             }
 
 
@@ -1180,6 +1199,8 @@ class ChainOfThoughtWrapper:
             # In a future multimodal version, generated_images might be included here
             "generated_images": generated_images_list, # Return the list (might be empty)
             "generation_duration": time.time() - start_time,
+            "device_metrics_before": device_metrics_before,
+            "device_metrics_after": get_device_metrics(self.device),
         }
 
 
