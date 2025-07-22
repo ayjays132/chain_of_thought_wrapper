@@ -6,15 +6,18 @@ from chain_of_thought_wrapper import (
     normalize_answer,
 )
 from .benchmark import benchmark_prompt
+from .simple_rag import SimpleRAG
 
 __all__ = [
     "ChainOfThoughtWrapper",
     "validate_device_selection",
     "normalize_answer",
     "benchmark_prompt",
+    "SimpleRAG",
 ]
 
 try:
     __version__ = version("cot-toolkit")
 except Exception:
     __version__ = "0.0.0"
+

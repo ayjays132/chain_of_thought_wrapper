@@ -1,91 +1,79 @@
 # 🚀 NeuroReasoner Chain-of-Thought Toolkit
 
-NeuroReasoner brings always-on chain-of-thought prompting to any Hugging Face model. The wrapper collects reasoning steps, reports device metrics and supports an optional Streamlit GUI.
+NeuroReasoner wraps any Hugging Face model with chain-of-thought (CoT) prompting. It exposes convenient metrics, a Streamlit GUI, and optional AGI helper modules.
 
 ## ⚙️ Installation
-
 ```bash
 pip install cot-toolkit
-# or, install from this repository
+# or from source
 pip install -r requirements.txt
 ```
 
-## 👩‍💻 Using the Wrapper
+## ✨ Key Features
+- **Always-on CoT** prompting with optional self-consistency
+- **Streamlit GUI** for interactive use
+- **RAG helper** (`SimpleRAG`) for lightweight retrieval
+- **Saved memories** that influence future answers
 
+## 👩‍💻 Quick Start
 ```python
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from cot_toolkit import ChainOfThoughtWrapper
 
 model_id = "sshleifer/tiny-gpt2"
-tokenizer = AutoTokenizer.from_pretrained(model_id)
+tok = AutoTokenizer.from_pretrained(model_id)
 model = AutoModelForCausalLM.from_pretrained(model_id)
-
-wrapper = ChainOfThoughtWrapper(model=model, processor=tokenizer, device="cpu")
-inputs = tokenizer("Why is the sky blue?", return_tensors="pt")
-result = wrapper.generate("Why is the sky blue?", generation_params={"max_new_tokens": 16})
+wrapper = ChainOfThoughtWrapper(model=model, processor=tok, device="cpu")
+wrapper.remember("My name is Alice")
+wrapper.rag_helper.add_document("Jupiter is the largest planet in our solar system.")
+result = wrapper.generate("Who am I and what is the largest planet?", generation_params={"max_new_tokens": 16})
 print(result["final_answers"][0])
 ```
 
 ## 🖥️ Launching the GUI
-
-Run the Streamlit interface:
-
+Run:
 ```bash
 streamlit run chain_of_thought_gui.py
 ```
-
-Configure the model, device and sampling options in the sidebar and enter your prompt.
+Configure model and sampling in the sidebar, then chat with the model.
 
 ## ⏳ Example GUI Session
-
 ```
 ▶ Prompt: What causes rainbows?
 ▶ Chains: 3, Self-Consistency: on
-▶ Sampling: temp 0.7, top-k 50, top-p 0.9
 …generating…
-▼ Chain 1 ▼
 1. Sunlight is made of many colors.
-2. Water droplets bend and split the light.
-3. The observer sees the separated colors as an arc.
-Final Answer: Rainbows appear when light refracts and disperses through droplets.
+2. Water droplets split the light.
+3. The observer sees the separated colors.
+Final Answer: Rainbows appear when light refracts through droplets.
 ```
 
 ## 📊 Benchmarking
-
-Run a benchmark on a small model to measure overhead:
-
 ```python
-from transformers import AutoTokenizer, AutoModelForCausalLM
 from cot_toolkit import ChainOfThoughtWrapper, benchmark_prompt
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 model_id = "sshleifer/tiny-gpt2"
-tokenizer = AutoTokenizer.from_pretrained(model_id)
+tok = AutoTokenizer.from_pretrained(model_id)
 model = AutoModelForCausalLM.from_pretrained(model_id)
-wrapper = ChainOfThoughtWrapper(model=model, processor=tokenizer, device="cpu")
-metrics = benchmark_prompt(wrapper, "What is the largest planet?")
+wrapper = ChainOfThoughtWrapper(model=model, processor=tok, device="cpu")
+wrapper.remember("benchmark demo")
+wrapper.rag_helper.add_document("Jupiter is the largest planet in our solar system.")
+metrics = benchmark_prompt(wrapper, "What is the largest planet?", {"max_new_tokens": 16})
 print(metrics)
 ```
-
 ### 📈 Latest Benchmark Example
-
-Running the above on CPU produced:
-
 ```
-{'cot_duration': 0.22, 'plain_duration': 0.31, 'cot_answer': 'stairs', 'plain_answer': 'stairs', 'cot_steps': 0}
+{'cot_duration': 0.19, 'plain_duration': 0.16, 'cot_answer': 'stairs stairs …', 'plain_answer': 'factors factors …', 'cot_steps': 0}
 ```
+Even this tiny model adds minimal overhead while providing structured reasoning.
 
-Even the tiny model returns a structured answer while adding only a small amount of latency.
-
-## ✨ GUI Highlights
-
-* Dark theme with copy-to-clipboard buttons
-* Responsive layout for desktop and mobile
-* Telemetry panel shows GPU or CPU usage
-* Optional premium and sci‑fi themes
-* Download chat history and last reasoning step
-* Generation duration and memory metrics displayed per response
-* Number words like "twenty-one" normalize to digits for better self-consistency
+## 📚 Memory & RAG Tips
+- `wrapper.remember(text)` stores a phrase permanently.
+- `wrapper.get_memories()` lists stored items.
+- `wrapper.rag_helper.add_document(text)` adds retrieval context.
+- `wrapper.rag_search(query)` returns top matching docs.
 
 ## 📜 License
+MIT
 
-Released under the MIT License.
