@@ -102,6 +102,16 @@ print(metrics)
 This runs generation with and without the CoT instruction and reports
 duration, final answers and step count.
 
+### 📈 Latest Benchmark Example
+
+Running the toolkit with `sshleifer/tiny-gpt2` on CPU produced the following metrics:
+
+```text
+{'cot_duration': 1.07, 'plain_duration': 0.18, 'cot_answer': 'stairs', 'plain_answer': 'factors', 'cot_steps': 0}
+```
+
+Even tiny models return a structured answer, though here only a single token was generated for each mode.
+
 ## ⏳ Example GUI Session
 
 ```text
