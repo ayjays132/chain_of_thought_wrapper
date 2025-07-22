@@ -120,10 +120,11 @@ st.set_page_config(
 with st.sidebar:
     theme_choice = st.selectbox(
         "🎨 Theme",
-        ["Dark", "Light"],
+        ["Dark", "Light", "Premium"],
         index=0,
         key="theme_select",
     )
+    auto_scroll = st.checkbox("Auto-scroll to latest", value=True, key="auto_scroll")
 
 LIGHT_THEME_CSS = """
 <style>
@@ -149,6 +150,33 @@ h1, h2, h3, h4, h5, h6 {
 }
 .stButton>button:hover {
     background: linear-gradient(180deg, #4DA3FF 0%, #0A84FF 100%) !important;
+}
+</style>
+"""
+
+PREMIUM_THEME_CSS = """
+<style>
+html, body, [data-testid="stAppViewContainer"] {
+    color: #F0F0F0 !important;
+}
+.stApp {
+    background: radial-gradient(circle at 20% 20%, #1b1b3a 0%, #0b0b20 100%) !important;
+    color: #F0F0F0 !important;
+}
+.stSidebar {
+    background: linear-gradient(180deg, #151525 0%, #202040 100%) !important;
+    border-right: 1px solid #444 !important;
+}
+h1, h2, h3, h4, h5, h6 {
+    color: #9E84FF !important;
+}
+.stButton>button {
+    background: linear-gradient(180deg, #9E84FF 0%, #6A5ACD 100%) !important;
+    color: #FFFFFF !important;
+    border: 1px solid #6A5ACD !important;
+}
+.stButton>button:hover {
+    background: linear-gradient(180deg, #B39BFF 0%, #9E84FF 100%) !important;
 }
 </style>
 """
@@ -1430,6 +1458,8 @@ st.markdown("""
 
 if theme_choice == "Light":
     st.markdown(LIGHT_THEME_CSS, unsafe_allow_html=True)
+elif theme_choice == "Premium":
+    st.markdown(PREMIUM_THEME_CSS, unsafe_allow_html=True)
 
 # --- Code Copy Script ---
 st.markdown(
@@ -2222,6 +2252,29 @@ with st.sidebar:
                 lines.append(f"{role}: {str(content)}")
         return "\n".join(lines)
 
+    def _last_cot_to_markdown(history):
+        """Extract the last chain-of-thought response as markdown."""
+        for msg in reversed(history):
+            if msg.get("type") == "cot_response" and isinstance(msg.get("content"), dict):
+                content = msg["content"]
+                md_lines = [f"**{content.get('main_output_label', 'Output')}:**", "", str(content.get('main_output_display', ''))]
+                details = content.get("details", {})
+                chains = details.get("generated_results", [])
+                if chains:
+                    md_lines.append("\n### Generated Chains\n")
+                    for i, chain in enumerate(chains, 1):
+                        md_lines.append(f"#### Chain {i}")
+                        full_text = chain.get("full_text", "")
+                        md_lines.append(f"```\n{full_text}\n```")
+                        final_ans = chain.get("final_answer")
+                        if final_ans:
+                            md_lines.append(f"**Final Answer:** {final_ans}")
+                consensus = details.get("consensus_answer")
+                if consensus:
+                    md_lines.append(f"\n**Consensus Answer:** {consensus}")
+                return "\n".join(md_lines)
+        return None
+
     if st.session_state.chat_history:
         history_text = _chat_history_to_text(st.session_state.chat_history)
         st.download_button(
@@ -2230,6 +2283,15 @@ with st.sidebar:
             file_name="chat_history.txt",
             mime="text/plain",
         )
+
+        last_cot_md = _last_cot_to_markdown(st.session_state.chat_history)
+        if last_cot_md:
+            st.download_button(
+                label="📥 Download Last Reasoning",
+                data=last_cot_md,
+                file_name="last_reasoning.md",
+                mime="text/markdown",
+            )
 
     if st.button("Reset Session"):
         logger.info("Reset Session button clicked.")
@@ -2508,8 +2570,15 @@ for message in st.session_state.chat_history:
 
                 # --- END Refactored Assistant CoT Response Rendering (Fixed Expander Nesting & Full Output as Main) ---
 
-            # In a future multimodal output version, generated images that are NOT tied to specific chains
-            # but might be a collective output could be displayed here (OUTSIDE the main details expander).
+                # In a future multimodal output version, generated images that are NOT tied to specific chains
+                # but might be a collective output could be displayed here (OUTSIDE the main details expander).
+
+# Auto-scroll to the bottom of the chat if enabled
+if st.session_state.get("auto_scroll"):
+    st.markdown(
+        "<script>window.scrollTo(0, document.body.scrollHeight);</script>",
+        unsafe_allow_html=True,
+    )
 
 # --- User input field and file uploader at the bottom ---
 # Use a form to group input and file uploader so pressing enter submits both
