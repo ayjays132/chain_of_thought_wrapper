@@ -1,133 +1,91 @@
 # 🚀 NeuroReasoner Chain-of-Thought Toolkit
 
-A breakthrough open-source suite providing: **always-on** Chain-of-Thought reasoning, **self-consistency** sampling, and **real-time telemetry**, all packaged as a Python wrapper and a futuristic Streamlit GUI.
-
-The interface ships with a sleek dark theme, smooth hover transitions, and a one-click "Copy" button on every code block for effortless sharing of generated scripts.
-
-## 📂 Included Scripts
-
-- `chain_of_thought_wrapper.py` – the core Python module you import into your own scripts.
-- `chain_of_thought_gui.py` – a Streamlit app for interactive, no-code usage.
+NeuroReasoner brings always-on chain-of-thought prompting to any Hugging Face model. The wrapper collects reasoning steps, reports device metrics and supports an optional Streamlit GUI.
 
 ## ⚙️ Installation
 
-1. Install from PyPI:
-   ```bash
-   pip install cot-toolkit
-   ```
-   Or clone this repo and install dependencies manually:
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. Ensure your model checkpoint (e.g. `ayjays132/NeuroReasoner-1-NR-1`) is accessible or change the name in the GUI script.
+```bash
+pip install cot-toolkit
+# or, install from this repository
+pip install -r requirements.txt
+```
 
-## 👩‍💻 Importing & Using the Wrapper
-
-Embed step-by-step reasoning directly in your Python code:
+## 👩‍💻 Using the Wrapper
 
 ```python
-from chain_of_thought_wrapper import ChainOfThoughtWrapper
 from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
+from cot_toolkit import ChainOfThoughtWrapper
 
-# 1) Load your tokenizer & model
-tokenizer = AutoTokenizer.from_pretrained("ayjays132/NeuroReasoner-1-NR-1")
-model     = AutoModelForCausalLM.from_pretrained("ayjays132/NeuroReasoner-1-NR-1")
-device    = "cuda" if torch.cuda.is_available() else "cpu"
-model.to(device)
+model_id = "sshleifer/tiny-gpt2"
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model = AutoModelForCausalLM.from_pretrained(model_id)
 
-# 2) Wrap with CoT logic
-cot = ChainOfThoughtWrapper(model=model, tokenizer=tokenizer, device=device)
-
-# 3) Prepare your prompt
-inputs = tokenizer("Why is the sky blue?", return_tensors="pt").to(device)
-
-# 4) Generate step-by-step reasoning
-result = cot.generate(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask)
-
-# 5) Inspect the output
-for i, step in enumerate(result["reasoning_steps"][0], 1):
-    print(f"Step {i}:", step)
-print("Final Answer:", result["final_answers"][0])
+wrapper = ChainOfThoughtWrapper(model=model, processor=tokenizer, device="cpu")
+inputs = tokenizer("Why is the sky blue?", return_tensors="pt")
+result = wrapper.generate("Why is the sky blue?", generation_params={"max_new_tokens": 16})
+print(result["final_answers"][0])
 ```
 
 ## 🖥️ Launching the GUI
 
-No code edits needed—just run:
+Run the Streamlit interface:
 
 ```bash
 streamlit run chain_of_thought_gui.py
 ```
 
-Then open the local URL in your browser. Adjust model name, device, number of chains, sampling parameters, and enter your prompt.
-
-## 🔧 GUI Configuration Options
-
-- **Model**: Hugging Face repo or local path.
-- **Device**: cuda or cpu.
-- **# Chains**: Number of reasoning samples.
-- **Self-Consistency**: Toggle majority-vote across chains.
-- **Max New Tokens**: Length of generated reasoning.
-- **Temperature**, **Top-k**, **Top-p** & **No-repeat n-gram**: Sampling controls.
-
-## ✨ Polished User Experience
-
-- **Dark theme** with neon accents and subtle gradients.
-- **Copy button** on each code block for instant script copying.
-- **Responsive layout** that adapts to desktop and mobile screens.
-- **Telemetry panel** displaying GPU stats in real time.
-- **Download Chat History** option for saving transcripts.
-- **Reset Session** button to quickly clear the interface.
-- **Premium theme** option for a high-contrast look.
-- **Alien theme** for a vibrant sci‑fi aesthetic.
-- **Auto-scroll** feature to always show the latest message.
-- **Download Last Reasoning** button for saving the most recent answer.
-- **Generation duration** displayed for each response.
-- **GPU/CPU memory metrics** returned with each generation call.
-- **Roman numeral normalization** ensures outputs like "IV" convert to "4".
-- **Hyphenated number words** like "twenty-one" convert to digits for cleaner voting.
-
-## 📊 Benchmarking
-
-Evaluate a wrapper's impact using the lightweight `benchmark_prompt` helper:
-
-```python
-from cot_toolkit import ChainOfThoughtWrapper, benchmark_prompt
-
-wrapper = ChainOfThoughtWrapper(model, tokenizer, device="cpu")
-metrics = benchmark_prompt(wrapper, "My prompt")
-print(metrics)
-```
-
-This runs generation with and without the CoT instruction and reports
-duration, final answers and step count.
-
-### 📈 Latest Benchmark Example
-
-Running the toolkit with `sshleifer/tiny-gpt2` on CPU produced the following metrics:
-
-```text
-{'cot_duration': 1.07, 'plain_duration': 0.18, 'cot_answer': 'stairs', 'plain_answer': 'factors', 'cot_steps': 0}
-```
-
-Even tiny models return a structured answer, though here only a single token was generated for each mode.
+Configure the model, device and sampling options in the sidebar and enter your prompt.
 
 ## ⏳ Example GUI Session
 
-```text
+```
 ▶ Prompt: What causes rainbows?
 ▶ Chains: 3, Self-Consistency: on
 ▶ Sampling: temp 0.7, top-k 50, top-p 0.9
 …generating…
 ▼ Chain 1 ▼
-1. Sunlight is composed of multiple colors.
-2. Water droplets refract and disperse each color.
-3. Observer sees spectrum as arc.
-Final Answer: Rainbows form when sunlight refracts and disperses through droplets, separating into colors.
-…
+1. Sunlight is made of many colors.
+2. Water droplets bend and split the light.
+3. The observer sees the separated colors as an arc.
+Final Answer: Rainbows appear when light refracts and disperses through droplets.
 ```
+
+## 📊 Benchmarking
+
+Run a benchmark on a small model to measure overhead:
+
+```python
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from cot_toolkit import ChainOfThoughtWrapper, benchmark_prompt
+
+model_id = "sshleifer/tiny-gpt2"
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model = AutoModelForCausalLM.from_pretrained(model_id)
+wrapper = ChainOfThoughtWrapper(model=model, processor=tokenizer, device="cpu")
+metrics = benchmark_prompt(wrapper, "What is the largest planet?")
+print(metrics)
+```
+
+### 📈 Latest Benchmark Example
+
+Running the above on CPU produced:
+
+```
+{'cot_duration': 0.22, 'plain_duration': 0.31, 'cot_answer': 'stairs', 'plain_answer': 'stairs', 'cot_steps': 0}
+```
+
+Even the tiny model returns a structured answer while adding only a small amount of latency.
+
+## ✨ GUI Highlights
+
+* Dark theme with copy-to-clipboard buttons
+* Responsive layout for desktop and mobile
+* Telemetry panel shows GPU or CPU usage
+* Optional premium and sci‑fi themes
+* Download chat history and last reasoning step
+* Generation duration and memory metrics displayed per response
+* Number words like "twenty-one" normalize to digits for better self-consistency
 
 ## 📜 License
 
-Released under the **MIT License**. Free to use, modify, and share—empower everyone with transparent, step-by-step AI reasoning!
-
+Released under the MIT License.
