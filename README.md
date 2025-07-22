@@ -87,6 +87,21 @@ Then open the local URL in your browser. Adjust model name, device, number of ch
 - **Roman numeral normalization** ensures outputs like "IV" convert to "4".
 - **Hyphenated number words** like "twenty-one" convert to digits for cleaner voting.
 
+## 📊 Benchmarking
+
+Evaluate a wrapper's impact using the lightweight `benchmark_prompt` helper:
+
+```python
+from cot_toolkit import ChainOfThoughtWrapper, benchmark_prompt
+
+wrapper = ChainOfThoughtWrapper(model, tokenizer, device="cpu")
+metrics = benchmark_prompt(wrapper, "My prompt")
+print(metrics)
+```
+
+This runs generation with and without the CoT instruction and reports
+duration, final answers and step count.
+
 ## ⏳ Example GUI Session
 
 ```text

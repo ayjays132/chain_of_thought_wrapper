@@ -5,11 +5,13 @@ from chain_of_thought_wrapper import (
     validate_device_selection,
     normalize_answer,
 )
+from .benchmark import benchmark_prompt
 
 __all__ = [
     "ChainOfThoughtWrapper",
     "validate_device_selection",
     "normalize_answer",
+    "benchmark_prompt",
 ]
 
 try:
