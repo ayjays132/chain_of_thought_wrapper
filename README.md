@@ -11,12 +11,15 @@ The interface ships with a sleek dark theme, smooth hover transitions, and a one
 
 ## ⚙️ Installation
 
-1. Clone or unzip this folder.
-2. Install required packages:
+1. Install from PyPI:
+   ```bash
+   pip install cot-toolkit
+   ```
+   Or clone this repo and install dependencies manually:
    ```bash
    pip install -r requirements.txt
    ```
-3. Ensure your model checkpoint (e.g. `ayjays132/NeuroReasoner-1-NR-1`) is accessible or change the name in the GUI script.
+2. Ensure your model checkpoint (e.g. `ayjays132/NeuroReasoner-1-NR-1`) is accessible or change the name in the GUI script.
 
 ## 👩‍💻 Importing & Using the Wrapper
 

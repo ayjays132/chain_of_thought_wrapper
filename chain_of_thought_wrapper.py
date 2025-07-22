@@ -392,6 +392,16 @@ class ChainOfThoughtWrapper:
 
 
         logger.debug("ChainOfThoughtWrapper __init__ finished.")
+        # maintain conversation state for convenience
+        self._chat_history: List[Dict[str, str]] = []
+
+    def chat(self, prompt: str, **kwargs) -> Tuple[Optional[List[Dict[str, str]]], Optional[str], Optional[str]]:
+        """Interact with the wrapper using a running chat history."""
+        result = self.generate(prompt, chat_history=self._chat_history, **kwargs)
+        self._chat_history.append({"role": "user", "content": prompt})
+        self._chat_history.append({"role": "assistant", "content": result[2] or ""})
+        return result
+
 
 
     def _build_agi_preamble(

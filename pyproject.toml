@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cot-toolkit"
+version = "0.1.0"
+description = "Chain-of-thought reasoning toolkit with GUI"
+authors = [ {name="OpenAI", email="opensource@example.com"} ]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "torch>=2.0.0",
+    "transformers>=4.31.0",
+    "streamlit>=1.24.0",
+    "pynvml>=11.5.0",
+    "numpy>=1.21.0",
+    "pillow>=9.3.0",
+]
+
+[project.urls]
+Homepage = "https://example.com"
+
+[tool.setuptools]
+packages = ["cot_toolkit"]
+py-modules = [
+    "chain_of_thought_wrapper",
+    "chain_of_thought_gui",
+    "AGIEnhancer",
+    "Enhanced_MemoryEngine",
+    "FullAGI_ExpansionModule",
+    "NeuroMemoryProcessor",
+    "SimulatedSelfAssessment",
+]
+
+[tool.setuptools.package-data]
+"" = ["*.py"]
