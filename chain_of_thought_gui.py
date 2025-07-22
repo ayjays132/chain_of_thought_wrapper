@@ -2748,9 +2748,9 @@ if send_button and (user_input or uploaded_image_data):
                      generation_params=current_gen_params, # Pass all params as a dict
                      chat_history=st.session_state.chat_history # Pass the stored history list
                  )
-                 end_time = time.time()
-                 duration = end_time - start_time
-                 status_box.write(f"Generation complete in {duration:.2f} seconds.")
+                end_time = time.time()
+                duration = outputs.get("generation_duration", end_time - start_time) if isinstance(outputs, dict) else end_time - start_time
+                status_box.write(f"Generation complete in {duration:.2f} seconds.")
                  update_telemetry() # Update telemetry after generation
 
                  # Process the outputs from the wrapper
@@ -2878,12 +2878,13 @@ if send_button and (user_input or uploaded_image_data):
                      "generation_params": current_gen_params, # Store actual params used
                      "model_name": model_name_current, # Store model info with the response
                      "device": device_current,
-                     "model_type": actual_model_class_name, # Store the loaded model architecture class name
-                     "is_multimodal_compatible": is_multimodal_compatible_loaded, # Store capability flag
+                    "model_type": actual_model_class_name, # Store the loaded model architecture class name
+                    "is_multimodal_compatible": is_multimodal_compatible_loaded, # Store capability flag
+                    "generation_duration": duration,
 
-                     "type": "cot_response", # Mark this as a structured CoT response for the renderer
-                     "id": len(st.session_state.chat_history) # Assign new ID
-                 }
+                    "type": "cot_response", # Mark this as a structured CoT response for the renderer
+                    "id": len(st.session_state.chat_history) # Assign new ID
+                }
                  st.session_state.chat_history.append({"role": "assistant", "content": assistant_response_data, "type": "cot_response", "id": len(st.session_state.chat_history)})
                  # --- END Refactored Response Data Structure ---
 
