@@ -157,8 +157,24 @@ def normalize_answer(answer: str) -> str:
         'eighty': '80', 'ninety': '90', 'hundred': '100', 'thousand': '1000',
         'million': '1000000', 'billion': '1000000000'
     }
-    # Simple word replacement - might fail on "twenty-two" or "one hundred".
-    # More robust parsing is complex.
+
+    # Handle simple hyphenated forms like "twenty-one"
+    hyphen_pattern = re.compile(
+        r"\b(" + "|".join([
+            'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy',
+            'eighty', 'ninety'
+        ]) + r")[- ](one|two|three|four|five|six|seven|eight|nine)\b",
+        re.IGNORECASE,
+    )
+
+    def _hyphen_repl(match: re.Match) -> str:
+        tens = int(num_word_map[match.group(1).lower()])
+        ones = int(num_word_map[match.group(2).lower()])
+        return str(tens + ones)
+
+    normalized = hyphen_pattern.sub(_hyphen_repl, normalized)
+
+    # Simple word replacement
     words = normalized.split()
     normalized_words = [num_word_map.get(word, word) for word in words]
     normalized = " ".join(normalized_words)

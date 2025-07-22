@@ -82,6 +82,7 @@ Then open the local URL in your browser. Adjust model name, device, number of ch
 - **Auto-scroll** feature to always show the latest message.
 - **Download Last Reasoning** button for saving the most recent answer.
 - **Roman numeral normalization** ensures outputs like "IV" convert to "4".
+- **Hyphenated number words** like "twenty-one" convert to digits for cleaner voting.
 
 ## ⏳ Example GUI Session
 
