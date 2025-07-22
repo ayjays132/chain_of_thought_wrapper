@@ -163,6 +163,24 @@ def normalize_answer(answer: str) -> str:
     normalized_words = [num_word_map.get(word, word) for word in words]
     normalized = " ".join(normalized_words)
 
+    # Convert simple Roman numerals (length >= 2 to avoid the pronoun "I")
+    roman_pattern = re.compile(r"\b[ivxlcdm]{2,}\b", re.IGNORECASE)
+
+    def roman_to_int(roman: str) -> int:
+        values = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
+        total = 0
+        prev = 0
+        for ch in roman.upper()[::-1]:
+            val = values.get(ch, 0)
+            if val < prev:
+                total -= val
+            else:
+                total += val
+                prev = val
+        return total
+
+    normalized = roman_pattern.sub(lambda m: str(roman_to_int(m.group(0))), normalized)
+
 
     # Remove extra whitespace within the string (replace multiple spaces with single)
     normalized = re.sub(r'\s+', ' ', normalized).strip()
