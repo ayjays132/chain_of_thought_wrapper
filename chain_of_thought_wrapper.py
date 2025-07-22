@@ -26,6 +26,7 @@ from PIL import Image  # Needed for handling image data
 import io  # Needed for handling image bytes
 import time  # Measure generation duration
 import psutil  # For CPU memory metrics
+from cot_toolkit.simple_rag import SimpleRAG
 
 if TYPE_CHECKING:
     from transformers import AutoTokenizer
@@ -445,6 +446,9 @@ class ChainOfThoughtWrapper:
         logger.debug("ChainOfThoughtWrapper __init__ finished.")
         # maintain conversation state for convenience
         self._chat_history: List[Dict[str, str]] = []
+        # simple user-controlled memory store
+        self.saved_memories: List[str] = []
+        self.rag_helper = SimpleRAG()
 
     def chat(self, prompt: str, **kwargs) -> Tuple[Optional[List[Dict[str, str]]], Optional[str], Optional[str]]:
         """Interact with the wrapper using a running chat history."""
@@ -452,6 +456,23 @@ class ChainOfThoughtWrapper:
         self._chat_history.append({"role": "user", "content": prompt})
         self._chat_history.append({"role": "assistant", "content": result[2] or ""})
         return result
+
+    # ─── Memory Convenience Methods ─────────────────────────────────────
+    def remember(self, text: str) -> None:
+        """Store a memory snippet for future prompts."""
+        self.saved_memories.append(text)
+
+    def get_memories(self) -> List[str]:
+        """Return list of saved memories."""
+        return list(self.saved_memories)
+
+    def clear_memories(self) -> None:
+        self.saved_memories = []
+
+    # ─── RAG Convenience Method ──────────────────────────────────────────
+    def rag_search(self, query: str, top_k: int = 1) -> List[str]:
+        """Retrieve relevant context from the RAG helper."""
+        return [d for d, _ in self.rag_helper.retrieve(query, top_k=top_k)]
 
 
 
@@ -463,6 +484,11 @@ class ChainOfThoughtWrapper:
         """Gather context from AGI helper modules for the generation prompt."""
         agi_pre_prompt_elements: List[str] = []
         self_assessment_summary_text: Optional[str] = None
+        if self.saved_memories:
+            agi_pre_prompt_elements.append("Memories: " + "; ".join(self.saved_memories))
+        rag_hits = self.rag_helper.retrieve(input_text, top_k=1)
+        if rag_hits:
+            agi_pre_prompt_elements.append("Context: " + rag_hits[0][0])
 
         if AGI_IMPORTS_SUCCESS and self.neo_sentient_core:
             perception_detail = (
