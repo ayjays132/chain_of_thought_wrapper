@@ -36,3 +36,6 @@ py-modules = [
 
 [tool.setuptools.package-data]
 "" = ["*.py"]
+
+[project.scripts]
+cot-cli = "cot_toolkit.cli:main"
