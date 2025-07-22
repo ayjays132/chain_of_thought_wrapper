@@ -22,8 +22,9 @@ from transformers import (
 )
 from typing import TYPE_CHECKING, Optional, List, Tuple, Dict, Union, Any
 import gc  # Import garbage collector for cleanup
-from PIL import Image # Needed for handling image data
-import io # Needed for handling image bytes
+from PIL import Image  # Needed for handling image data
+import io  # Needed for handling image bytes
+import time  # Measure generation duration
 
 if TYPE_CHECKING:
     from transformers import AutoTokenizer
@@ -573,12 +574,20 @@ class ChainOfThoughtWrapper:
             3. The raw body text of the model's response (or None).
         """
         logger.debug("Wrapper generate method called.")
+        start_time = time.time()
         # Added check for model generation compatibility at the start of generate
         if self.model is None or self.processor is None or self.tokenizer is None or \
            not (hasattr(self.model, 'generate') and callable(getattr(self.model, 'generate', None)) or isinstance(self.model, GenerationMixin)):
             logger.error("Model, Processor, Tokenizer not loaded or loaded model is not generation compatible.")
             # Return an empty result dict to indicate failure, GUI will handle displaying error
-            return {"full_texts": [], "reasoning_steps": [], "final_answers": [], "generated_images": [], "generation_scores": None}
+            return {
+                "full_texts": [],
+                "reasoning_steps": [],
+                "final_answers": [],
+                "generated_images": [],
+                "generation_scores": None,
+                "generation_duration": time.time() - start_time,
+            }
 
 
         # Safely get generation parameters
@@ -846,7 +855,14 @@ class ChainOfThoughtWrapper:
                     logger.warning(f"Error during cuda empty_cache: {cleanup_e}")
             gc.collect()
             # Do not re-raise here, return empty lists and let the GUI handle the error
-            return {"full_texts": [], "reasoning_steps": [], "final_answers": [], "generated_images": [], "generation_scores": None}
+            return {
+                "full_texts": [],
+                "reasoning_steps": [],
+                "final_answers": [],
+                "generated_images": [],
+                "generation_scores": None,
+                "generation_duration": time.time() - start_time,
+            }
 
 
         # --- Generate Response ---
@@ -981,7 +997,14 @@ class ChainOfThoughtWrapper:
                     logger.warning(f"Error during cuda empty_cache: {cleanup_e}")
             gc.collect()
             # Do not re-raise here, return empty lists and let the GUI handle the error
-            return {"full_texts": [], "reasoning_steps": [], "final_answers": [], "generated_images": [], "generation_scores": None}
+            return {
+                "full_texts": [],
+                "reasoning_steps": [],
+                "final_answers": [],
+                "generated_images": [],
+                "generation_scores": None,
+                "generation_duration": time.time() - start_time,
+            }
 
 
         # --- Process Generated Outputs ---
@@ -1155,7 +1178,8 @@ class ChainOfThoughtWrapper:
             "final_answers": final_answers,
             "generation_scores": generation_scores, # Include scores (will be None if not requested/available)
             # In a future multimodal version, generated_images might be included here
-            "generated_images": generated_images_list # Return the list (might be empty)
+            "generated_images": generated_images_list, # Return the list (might be empty)
+            "generation_duration": time.time() - start_time,
         }
 
 
