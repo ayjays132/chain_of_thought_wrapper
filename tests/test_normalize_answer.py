@@ -21,6 +21,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
         ("A quick BROWN Fox.", "quick brown fox"),
         ("Output -   ten.", "10"),
         ("Ninety-nine bottles!", "ninety-nine bottles"),
+        ("I have IV apples.", "i have 4 apples"),
+        ("Chapter XI", "chapter 11"),
         (123, ""),
         (["not", "a", "string"], ""),
     ],

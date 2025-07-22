@@ -81,6 +81,7 @@ Then open the local URL in your browser. Adjust model name, device, number of ch
 - **Premium theme** option for a high-contrast look.
 - **Auto-scroll** feature to always show the latest message.
 - **Download Last Reasoning** button for saving the most recent answer.
+- **Roman numeral normalization** ensures outputs like "IV" convert to "4".
 
 ## ⏳ Example GUI Session
 
