@@ -2768,19 +2768,19 @@ if send_button and (user_input or uploaded_image_data):
              update_telemetry() # Update telemetry at start of generation
 
              outputs = None # Initialize outputs to None
-             try:
-                 # Call the wrapper's generate method
-                 # Pass text input, image data (list of bytes), and generation parameters
-                 outputs = st.session_state.cot_wrapper.generate(
-                     input_text=user_input, # Pass user text
-                     image_data=uploaded_image_data, # Pass the image data (list of bytes)
-                     generation_params=current_gen_params, # Pass all params as a dict
-                     chat_history=st.session_state.chat_history # Pass the stored history list
-                 )
-                end_time = time.time()
-                duration = outputs.get("generation_duration", end_time - start_time) if isinstance(outputs, dict) else end_time - start_time
-                status_box.write(f"Generation complete in {duration:.2f} seconds.")
-                 update_telemetry() # Update telemetry after generation
+         try:
+             # Call the wrapper's generate method
+             outputs = st.session_state.cot_wrapper.generate(
+                 input_text=user_input,
+                 image_data=uploaded_image_data,
+                 generation_params=current_gen_params,
+                 chat_history=st.session_state.chat_history
+             )
+             end_time = time.time()
+             duration = outputs.get("generation_duration", end_time - start_time) \
+                        if isinstance(outputs, dict) else (end_time - start_time)
+             status_box.write(f"Generation complete in {duration:.2f} seconds.")
+             update_telemetry()  # Update telemetry after generation
 
                  # Process the outputs from the wrapper
                  generated_results_list = []
