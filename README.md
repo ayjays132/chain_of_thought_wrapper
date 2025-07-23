@@ -98,8 +98,9 @@ This prints a dictionary with durations and answers for each mode.
 
 ## 🚀 Releasing to PyPI
 This project uses [PyPI Trusted Publishing](https://docs.pypi.org/trusted-publishers/) via GitHub Actions.
-Create a GitHub release and the `release.yml` workflow will build and upload a new version.
-Ensure the `pypi` environment is configured with PyPI as a trusted publisher.
+Creating a GitHub release triggers the `python-app.yml` workflow which runs the tests,
+builds the package and uploads it to PyPI.
+Make sure the repository has a `pypi` environment configured as a Trusted Publisher.
 
 
 ## 📜 License
