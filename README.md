@@ -1,6 +1,6 @@
 # 🚀 NeuroReasoner Chain-of-Thought Toolkit
 
-**NeuroReasoner** is a small but capable playground for chain-of-thought prompting, retrieval augmented generation and persistent memories. Everything runs locally with free Hugging Face models and a lightweight Streamlit GUI.
+**NeuroReasoner** offers a compact yet capable playground for chain-of-thought prompting, retrieval‑augmented generation (RAG), and lightweight persistent memories. Everything runs locally using free Hugging Face models and a minimal Streamlit GUI.
 
 ---
 
@@ -13,12 +13,12 @@ pip install -r requirements.txt
 
 ## ✨ Features
 - **Self‑consistent CoT prompting** with majority voting
-- **Streamlit GUI** for chat‑style interaction
-- **Tiny retrieval‑augmented generation** helper
+- **Streamlit GUI** for an interactive chat experience
+- **Mini RAG helper** to inject custom context
 - **Persistent memories** that survive between sessions
-- **Reference past conversations and memories** when replying
+- **Reference prior conversations** when generating
 - **Record history** management for transcripts or notes
-- **Benchmark utilities** to measure CoT vs. plain generation
+- **Benchmark utilities** for CoT vs. plain generation
 
 ---
 
@@ -37,7 +37,6 @@ wrapper.add_record("Session started")
 wrapper.rag_helper.add_document("Jupiter is the largest planet.")
 res = wrapper.generate("Who am I and what is the largest planet?", generation_params={"max_new_tokens":16})
 print(res["final_answers"][0])
-# later we can inspect
 print(wrapper.get_records())
 ```
 
@@ -45,7 +44,7 @@ print(wrapper.get_records())
 ```bash
 streamlit run chain_of_thought_gui.py
 ```
-Use the sidebar to select a model and toggle self-consistency.
+Use the sidebar to select a model and toggle self‑consistency.
 
 ---
 
@@ -62,15 +61,14 @@ Final Answer: Rainbows appear when light refracts through droplets.
 
 ### 📈 Latest Benchmark Example
 ```
-{'cot_duration': 0.119, 'plain_duration': 0.163,
+{'cot_duration': 0.2859, 'plain_duration': 0.1203,
  'cot_answer': 'stairs',
- 'plain_answer': 'factors', 'cot_steps': 0}
+ 'plain_answer': 'stairs', 'cot_steps': 0}
 ```
 *(measured with `sshleifer/tiny-gpt2` on CPU)*
 
 ## 📊 Benchmarking
-Run the built‑in benchmark helper to compare CoT vs. plain generation:
-
+Run the built-in benchmark helper to compare CoT vs. plain generation:
 ```bash
 python - <<'PY'
 from transformers import AutoTokenizer, AutoModelForCausalLM
