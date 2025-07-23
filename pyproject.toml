@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cot-toolkit"
-version = "0.1.0"
+version = "1.0.0"
 description = "Chain-of-thought reasoning toolkit with GUI"
 authors = [ {name="OpenAI", email="opensource@example.com"} ]
 license = {text = "MIT"}

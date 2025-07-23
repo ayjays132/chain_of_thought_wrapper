@@ -28,6 +28,12 @@ import time  # Measure generation duration
 import psutil  # For CPU memory metrics
 from cot_toolkit.simple_rag import SimpleRAG
 
+try:
+    from importlib.metadata import version
+    __version__ = version("cot-toolkit")
+except Exception:  # pragma: no cover - fallback when package metadata missing
+    __version__ = "0.0.0"
+
 if TYPE_CHECKING:
     from transformers import AutoTokenizer
 

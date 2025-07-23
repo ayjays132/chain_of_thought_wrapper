@@ -10,6 +10,7 @@ pip install cot-toolkit
 # or from source
 pip install -r requirements.txt
 ```
+The toolkit is available on PyPI under the name `cot-toolkit`.
 
 ## ✨ Features
 - **Self‑consistent CoT prompting** with majority voting
