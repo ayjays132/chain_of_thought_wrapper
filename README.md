@@ -1,6 +1,6 @@
 # 🚀 NeuroReasoner Chain-of-Thought Toolkit
 
-**NeuroReasoner** wraps any Hugging Face model with always-on chain-of-thought (CoT) prompting, a lightweight retrieval system and persistent memories. A simple Streamlit GUI lets you chat with the model and toggle self-consistency. Everything runs locally using free models.
+**NeuroReasoner** is a small but capable playground for chain-of-thought prompting, retrieval augmented generation and persistent memories. Everything runs locally with free Hugging Face models and a lightweight Streamlit GUI.
 
 ---
 
