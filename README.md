@@ -1,6 +1,6 @@
 # 🚀 NeuroReasoner Chain-of-Thought Toolkit
 
-**NeuroReasoner** wraps any Hugging Face model with always-on chain-of-thought (CoT) prompting, a lightweight retrieval system and persistent memories. A simple Streamlit GUI lets you chat with the model and toggle self-consistency. Everything runs locally using free models.
+**NeuroReasoner** is a small but capable playground for chain-of-thought prompting, retrieval augmented generation and persistent memories. Everything runs locally with free Hugging Face models and a lightweight Streamlit GUI.
 
 ---
 
@@ -58,9 +58,7 @@ Final Answer: Rainbows appear when light refracts through droplets.
 
 ### 📈 Latest Benchmark Example
 ```
-{'cot_duration': 0.146, 'plain_duration': 0.128,
- 'cot_answer': 'stairs',
- 'plain_answer': 'factors', 'cot_steps': 0}
+{'cot_duration': 0.143, 'plain_duration': 0.110, 'cot_answer': 'stairs', 'plain_answer': 'factors', 'cot_steps': 0}
 ```
 
 ## 📊 Benchmarking
