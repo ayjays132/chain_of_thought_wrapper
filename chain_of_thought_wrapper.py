@@ -448,6 +448,8 @@ class ChainOfThoughtWrapper:
         self._chat_history: List[Dict[str, str]] = []
         # simple user-controlled memory store
         self.saved_memories: List[str] = []
+        # persistent record history separate from chat
+        self.record_history: List[str] = []
         self.rag_helper = SimpleRAG()
 
     def chat(self, prompt: str, **kwargs) -> Tuple[Optional[List[Dict[str, str]]], Optional[str], Optional[str]]:
@@ -469,6 +471,18 @@ class ChainOfThoughtWrapper:
     def clear_memories(self) -> None:
         self.saved_memories = []
 
+    # ─── Record History Convenience Methods ─────────────────────────────
+    def add_record(self, text: str) -> None:
+        """Append a record (e.g., transcript note) for later reference."""
+        self.record_history.append(text)
+
+    def get_records(self) -> List[str]:
+        """Return list of saved record snippets."""
+        return list(self.record_history)
+
+    def clear_records(self) -> None:
+        self.record_history = []
+
     # ─── RAG Convenience Method ──────────────────────────────────────────
     def rag_search(self, query: str, top_k: int = 1) -> List[str]:
         """Retrieve relevant context from the RAG helper."""
@@ -486,6 +500,8 @@ class ChainOfThoughtWrapper:
         self_assessment_summary_text: Optional[str] = None
         if self.saved_memories:
             agi_pre_prompt_elements.append("Memories: " + "; ".join(self.saved_memories))
+        if self.record_history:
+            agi_pre_prompt_elements.append("Records: " + "; ".join(self.record_history[-5:]))
         rag_hits = self.rag_helper.retrieve(input_text, top_k=1)
         if rag_hits:
             agi_pre_prompt_elements.append("Context: " + rag_hits[0][0])
