@@ -96,5 +96,11 @@ This prints a dictionary with durations and answers for each mode.
 - `wrapper.rag_helper.retrieve(query)` returns matching docs to insert into prompts.
 - The wrapper automatically references previous chat history when answering.
 
+## 🚀 Releasing to PyPI
+This project uses [PyPI Trusted Publishing](https://docs.pypi.org/trusted-publishers/) via GitHub Actions.
+Create a GitHub release and the `release.yml` workflow will build and upload a new version.
+Ensure the `pypi` environment is configured with PyPI as a trusted publisher.
+
+
 ## 📜 License
 MIT
