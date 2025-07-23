@@ -1,6 +1,6 @@
 # 🚀 NeuroReasoner Chain-of-Thought Toolkit
 
-**NeuroReasoner** wraps any Hugging Face model with always-on chain-of-thought (CoT) prompting, a tiny RAG helper and persistent memory utilities. A lightweight Streamlit GUI is provided for quick experiments.
+**NeuroReasoner** wraps any Hugging Face model with always-on chain-of-thought (CoT) prompting, a lightweight retrieval system and persistent memories. A simple Streamlit GUI lets you chat with the model and toggle self-consistency. Everything runs locally using free models.
 
 ---
 
@@ -12,11 +12,12 @@ pip install -r requirements.txt
 ```
 
 ## ✨ Features
-- **Self-consistent CoT prompting** out of the box
-- **Streamlit GUI** for chat-style interaction
-- **Simple RAG helper** for storing and retrieving facts
-- **Saved memories** that persist between runs
-- **Benchmark utilities** for measuring CoT vs. plain generation
+- **Self‑consistent CoT prompting** with majority voting
+- **Streamlit GUI** for chat‑style interaction
+- **Tiny retrieval‑augmented generation** helper
+- **Persistent memories** that survive between sessions
+- **Reference past conversations and memories** when replying
+- **Benchmark utilities** to measure CoT vs. plain generation
 
 ---
 
@@ -57,18 +58,36 @@ Final Answer: Rainbows appear when light refracts through droplets.
 
 ### 📈 Latest Benchmark Example
 ```
-{'cot_duration': 0.13, 'plain_duration': 0.16,
- 'cot_answer': 'stairs stairs ...',
- 'plain_answer': 'factors factors ...', 'cot_steps': 0}
+{'cot_duration': 0.146, 'plain_duration': 0.128,
+ 'cot_answer': 'stairs',
+ 'plain_answer': 'factors', 'cot_steps': 0}
 ```
+
+## 📊 Benchmarking
+Run the built‑in benchmark helper to compare CoT vs. plain generation:
+
+```bash
+python - <<'PY'
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from cot_toolkit import ChainOfThoughtWrapper, benchmark_prompt
+
+tok = AutoTokenizer.from_pretrained('sshleifer/tiny-gpt2')
+model = AutoModelForCausalLM.from_pretrained('sshleifer/tiny-gpt2')
+wrapper = ChainOfThoughtWrapper(model=model, processor=tok, device='cpu')
+print(benchmark_prompt(wrapper, 'What causes rainbows?'))
+PY
+```
+This prints a dictionary with durations and answers for each mode.
 
 ---
 
 ## 📚 Memory & RAG Tips
 - `wrapper.remember(text)` stores a short fact for later reference.
 - `wrapper.get_memories()` lists everything stored so far.
+- `wrapper.forget_all()` clears them.
 - `wrapper.rag_helper.add_document(text)` adds retrieval context.
 - `wrapper.rag_helper.retrieve(query)` returns matching docs to insert into prompts.
+- The wrapper automatically references previous chat history when answering.
 
 ## 📜 License
 MIT
